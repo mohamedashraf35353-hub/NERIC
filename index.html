@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#0a5cff">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202610272013"></script>
+<script src="config.js?v=202610272118"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2256,8 +2256,27 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   window.NERIC_API = '';
   document.addEventListener('DOMContentLoaded', function(){ var e = document.getElementById('lgErr'); if (e){ e.textContent = 'التطبيق لسه مش متوصل بالسيرفر — المسؤول لازم يحط رابط تطبيق الويب في ملف config.js'; e.classList.remove('hidden'); } });
 }
+/* لون شريط الموبايل اللي فوق (الساعة والإشعارات): أزرق في الوضع العادي وغامق في الليلي — علشان الأيقونات البيضا تبان */
+(function(){
+  function sync(){
+    var t = document.documentElement.getAttribute('data-theme');
+    var dark = t ? t === 'dark' : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+    var c = dark ? '#0b1220' : '#0a5cff';
+    var old = document.querySelectorAll('meta[name=theme-color]');
+    if (old.length === 1 && old[0].getAttribute('content') === c && sync.done) return;
+    // بنشيل القديم ونحط meta جديد — كروم على الموبايل بيحدّث لون الشريط لما الـ meta يتضاف من جديد
+    Array.prototype.forEach.call(old, function(m){ m.parentNode.removeChild(m); });
+    var m = document.createElement('meta'); m.name = 'theme-color'; m.content = c; document.head.appendChild(m);
+    sync.done = 1;
+  }
+  sync();
+  window.addEventListener('load', function(){ sync.done = 0; sync(); setTimeout(function(){ sync.done = 0; sync(); }, 600); });
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden){ sync.done = 0; sync(); } });
+  new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
+})();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202610272013').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202610272118').catch(function(){}); });
 </script>
 </body>
 </html>
