@@ -1,0 +1,33 @@
+{
+  "name": "NERIC - فريق الكهرباء",
+  "short_name": "NERIC",
+  "lang": "ar",
+  "dir": "rtl",
+  "description": "متابعة أعمال الكهرباء في صالون العربة — الإنتاج والتوقفات والمشكلات والحضور",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f3f6fb",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
