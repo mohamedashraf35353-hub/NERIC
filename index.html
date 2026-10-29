@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202610290823"></script>
+<script src="config.js?v=202610291114"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -872,7 +872,9 @@ body.ds-C{background:var(--bg)!important}
 .cbell .bellic{display:inline-block}
 .cbell .bellic.ring{animation:bellRing 4s ease-in-out infinite;transform-origin:50% 10%}
 @keyframes bellRing{0%,82%,100%{transform:rotate(0)}85%{transform:rotate(16deg)}88%{transform:rotate(-14deg)}91%{transform:rotate(10deg)}94%{transform:rotate(-6deg)}97%{transform:rotate(2deg)}}
-@media (max-width:520px){ .clist-h .bell-t{display:none} }
+.clist-h .bell-t{display:none}
+.clist-h .cbell{min-width:38px;justify-content:center}
+.clist-h h1.page{white-space:nowrap}
 .ptip{display:flex;align-items:center;gap:10px;margin:2px 0 4px;padding:10px 12px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--blue) 35%,var(--line));
   background:linear-gradient(135deg,color-mix(in srgb,var(--blue) 10%,var(--card)),color-mix(in srgb,#06b6d4 8%,var(--card)));box-shadow:0 0 18px -8px color-mix(in srgb,var(--blue) 70%,transparent)}
 .ptip.hidden{display:none}
@@ -948,6 +950,14 @@ body.ds-C{background:var(--bg)!important}
 .topnav a:hover .ni i,.side a:hover .ni i{animation-duration:.9s}
 @media (prefers-reduced-motion:reduce){ .ni i,.nchart *{animation:none!important} }
 
+
+/* ---------- «متصل الآن»: كلمة خضرا جنب الاسم + نفس النبض الأخضر حوالين الصورة ---------- */
+.onl{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;color:var(--green);white-space:nowrap;vertical-align:middle;margin-inline-start:4px}
+.onl::before{content:"";width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(57,255,20,.7);animation:onlDot 3s ease-in-out infinite}
+.sub .onl{margin-inline:0 8px}
+@keyframes onlDot{0%,100%{box-shadow:0 0 0 0 rgba(57,255,20,0)}6%,62%{box-shadow:0 0 0 3px rgba(57,255,20,.35),0 0 8px 2px rgba(57,255,20,.7)}70%{box-shadow:0 0 0 0 rgba(57,255,20,0)}}
+.citem.online .cav,.cpane-h.online .cav{animation:neonRing 3s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){ .onl::before,.citem.online .cav,.cpane-h.online .cav{animation:none} }
 /* ---------- الهيدر: الصورة والاسم أكبر وأوضح + زرار الخروج ---------- */
 .whoav{margin-inline-end:12px}
 .whoav .cav.sm{flex:0 0 50px;width:50px;height:50px;font-size:20px}
@@ -2576,7 +2586,7 @@ function openImage(id, name){
   }).catch(function(e){ toast(e.message, 'err'); });
 }
 
-var CHAT = { unread: 0, convs: [], with: null, msgs: [], timer: null, poll: null, busy: false, att: null };
+var CHAT = { unread: 0, convs: [], online: [], with: null, msgs: [], timer: null, poll: null, busy: false, att: null };
 function chatBadge(n){
   CHAT.unread = n || 0;
   Array.prototype.forEach.call(document.querySelectorAll('[data-chatbadge]'), function(b){ b.textContent = n > 99 ? '99+' : String(n || ''); b.classList.toggle('hidden', !n); });
@@ -2586,7 +2596,7 @@ function startChatPoll(){
   if (CHAT.poll) return;
   function tick(){
     if (!S.token || document.hidden || S.view === 'chat') return;
-    call('chatSummary').then(function(x){ CHAT.convs = x.convs; chatBadge(x.unread); }).catch(function(){});
+    call('chatSummary').then(function(x){ CHAT.convs = x.convs; CHAT.online = x.online || CHAT.online; chatBadge(x.unread); }).catch(function(){});
   }
   CHAT.poll = setInterval(tick, 45000); setTimeout(tick, 1500);
 }
@@ -2602,13 +2612,13 @@ VIEWS.chat = function(p){
   $('cSearch').oninput = renderChatList;
   $('cBell').onclick = openPushForm; pushRefreshUI();
   fitChat(); if (!CHAT.fit){ CHAT.fit = 1; window.addEventListener('resize', fitChat); }
-  call('chatSummary').then(function(x){ CHAT.convs = x.convs; chatBadge(x.unread); renderChatList(); if (CHAT.with) openChat(CHAT.with, true); })
+  call('chatSummary').then(function(x){ CHAT.convs = x.convs; CHAT.online = x.online || CHAT.online; chatBadge(x.unread); renderChatList(); if (CHAT.with) openChat(CHAT.with, true); })
     .catch(function(e){ $('cItems').innerHTML = emptyHTML('ماقدرتش أحمّل الدردشة', e.message); });
   clearInterval(CHAT.timer);
   CHAT.timer = setInterval(function(){
     if (S.view !== 'chat'){ clearInterval(CHAT.timer); return; }
     if (document.hidden || CHAT.busy) return;
-    if (CHAT.with) refreshChat(); else call('chatSummary').then(function(x){ CHAT.convs = x.convs; chatBadge(x.unread); renderChatList(); }).catch(function(){});
+    if (CHAT.with) refreshChat(); else call('chatSummary').then(function(x){ CHAT.convs = x.convs; CHAT.online = x.online || CHAT.online; chatBadge(x.unread); renderChatList(); }).catch(function(){});
   }, 8000);
 };
 /** الدردشة بتملا الشاشة لحد الشريط اللي تحت بالظبط — علشان خانة الكتابة تفضل ظاهرة */
@@ -2635,18 +2645,31 @@ function renderChatList(){
     var c = by[id], last = c && c.last;
     var body = last ? ((last.file ? (isImgType(last.file.type) ? '📷 صورة' : (/^audio\//.test(last.file.type || '') ? '🎤 رسالة صوتية' : '📎 ' + last.file.name)) + (last.text ? ' — ' : '') : '') + (last.text || '')) : '';
     var prev = last ? (last.from === B().me.email ? 'انت: ' : (id === 'ALL' ? last.fromName + ': ' : '')) + body : (id === 'ALL' ? 'ابدأ الكلام مع الفريق كله' : chatSub(id));
-    return '<button class="citem' + (id === 'ALL' ? ' pin' : '') + (id === CHAT.with ? ' on' : '') + (c && c.unread ? ' un' : '') + '" data-chat="' + esc(id) + '">' +
+    var onl = id !== 'ALL' && isOnline(id);
+    return '<button class="citem' + (id === 'ALL' ? ' pin' : '') + (id === CHAT.with ? ' on' : '') + (c && c.unread ? ' un' : '') + (onl ? ' online' : '') + '" data-chat="' + esc(id) + '">' +
       avatarHTML(id) +
-      '<span class="cmeta"><span class="ctop"><b>' + esc(chatName(id)) + (id === 'ALL' ? ' <span class="cpin" title="متثبتة">📌</span>' : '') + '</b><time>' + (last ? chatTime(last.time) : '') + '</time></span>' +
+      '<span class="cmeta"><span class="ctop"><b>' + esc(chatName(id)) + (id === 'ALL' ? ' <span class="cpin" title="متثبتة">📌</span>' : '') + (onl ? ' <span class="onl">متصل الآن</span>' : '') + '</b><time>' + (last ? chatTime(last.time) : '') + '</time></span>' +
       '<span class="cbot"><span class="cprev">' + esc(prev.replace(/\s+/g, ' ')) + '</span>' + (c && c.unread ? '<span class="cun">' + c.unread + '</span>' : '') + '</span></span></button>';
   }).join('') : '<div class="sub" style="padding:14px">مفيش نتايج.</div>';
   Array.prototype.forEach.call(document.querySelectorAll('[data-chat]'), function(b){ b.onclick = function(){ openChat(b.dataset.chat); }; });
+  paintPaneOnline();
+}
+/* ---------- «متصل الآن» ---------- */
+function isOnline(email){ return (CHAT.online || []).indexOf(email) >= 0; }
+function onlineSub(id){
+  if (id === 'ALL'){ var me = B().me.email, n = (CHAT.online || []).filter(function(e){ return e !== me; }).length; return n ? '<span class="onl">' + n + (n === 1 ? ' متصل' : (n === 2 ? ' متصلين' : ' متصلين')) + ' الآن</span>' : ''; }
+  return isOnline(id) ? '<span class="onl">متصل الآن</span>' : '';
+}
+function paintPaneOnline(){
+  var h = document.querySelector('.cpane-h'), id = CHAT.with; if (!h || !id) return;
+  h.classList.toggle('online', id !== 'ALL' && isOnline(id));
+  var o = $('cOnl'); if (o) o.innerHTML = onlineSub(id);
 }
 function openChat(id, keep){
   CHAT.with = id; if (!keep) CHAT.msgs = [];
   $('chatwrap').classList.add('open');
   $('cPane').innerHTML = '<div class="cpane-h"><button class="icon-btn cback" id="cBack" aria-label="رجوع">→</button>' + avatarHTML(id) +
-    '<div><b>' + esc(chatName(id)) + '</b><div class="sub" style="margin:0">' + esc(chatSub(id)) + (id === 'ALL' ? '' : ' — محادثة خاصة') + '</div></div>' +
+    '<div><b>' + esc(chatName(id)) + '</b><div class="sub" style="margin:0"><span id="cOnl">' + onlineSub(id) + '</span>' + esc(chatSub(id)) + (id === 'ALL' ? '' : ' — محادثة خاصة') + '</div></div>' +
     (id === 'ALL' && isOwner() ? '<span class="sp"></span><button type="button" class="btn sm cgrp" id="cGrpPic" title="تغيير صورة الدردشة العامة" aria-label="تغيير صورة الدردشة العامة">📷<span> صورة الدردشة</span></button>' : '') + '</div>' +
     '<div class="cmsgs" id="cMsgs">' + loadingHTML() + '</div>' +
     ('<div class="catt hidden" id="cAtt"></div><form class="cform" id="cForm"><button type="button" class="icon-btn cclip" id="cClip" title="صورة أو ملف" aria-label="إرفاق صورة أو ملف">📎</button><input type="file" id="cFile" hidden><input type="file" id="cAudio" accept="audio/*" capture hidden><textarea id="cText" rows="1" maxlength="1000" placeholder="اكتب رسالة..." autocomplete="off"></textarea><button class="cact mic" id="cSend" type="submit" aria-label="تسجيل رسالة صوتية">' + ICO_MIC + ICO_SEND + '</button></form>');
@@ -2683,7 +2706,7 @@ function refreshChat(first){
     CHAT.busy = false;
     if (CHAT.with !== id || S.view !== 'chat') return;
     var changed = x.messages.length !== CHAT.msgs.filter(function(m){ return !m.pending; }).length || (x.messages.length && CHAT.msgs.length && x.messages[x.messages.length - 1].id !== CHAT.msgs[CHAT.msgs.length - 1].id);
-    CHAT.convs = x.convs; chatBadge(x.unread); renderChatList();
+    CHAT.convs = x.convs; CHAT.online = x.online || CHAT.online; chatBadge(x.unread); renderChatList();
     if (first || changed){ CHAT.msgs = x.messages; renderMsgs(first); }
   }).catch(function(e){ CHAT.busy = false; if (first && $('cMsgs')) $('cMsgs').innerHTML = emptyHTML('ماقدرتش أحمّل الرسايل', e.message); });
 }
@@ -2987,8 +3010,8 @@ if (window.NERIC_API && 'serviceWorker' in navigator) navigator.serviceWorker.ad
   if (!S.token || !S.boot) return;
   if (d.type === 'openChat'){ CHAT.with = d.conv || null; go('chat'); }
   else if (d.type === 'push'){
-    if (S.view === 'chat'){ if (CHAT.with === d.conv) refreshChat(); else call('chatSummary').then(function(x){ CHAT.convs = x.convs; chatBadge(x.unread); renderChatList(); }).catch(function(){}); }
-    else { call('chatSummary').then(function(x){ CHAT.convs = x.convs; chatBadge(x.unread); }).catch(function(){}); if (d.title) toast('💬 ' + d.title.replace(/\s*💬$/, '') + ': ' + String(d.line || d.body || '').slice(0, 80), 'ok'); }
+    if (S.view === 'chat'){ if (CHAT.with === d.conv) refreshChat(); else call('chatSummary').then(function(x){ CHAT.convs = x.convs; CHAT.online = x.online || CHAT.online; chatBadge(x.unread); renderChatList(); }).catch(function(){}); }
+    else { call('chatSummary').then(function(x){ CHAT.convs = x.convs; CHAT.online = x.online || CHAT.online; chatBadge(x.unread); }).catch(function(){}); if (d.title) toast('💬 ' + d.title.replace(/\s*💬$/, '') + ': ' + String(d.line || d.body || '').slice(0, 80), 'ok'); }
   }
 });
 
@@ -3252,7 +3275,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202610290823').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202610291114').catch(function(){}); });
 </script>
 </body>
 </html>
