@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202610291114"></script>
+<script src="config.js?v=202610291159"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -951,6 +951,16 @@ body.ds-C{background:var(--bg)!important}
 @media (prefers-reduced-motion:reduce){ .ni i,.nchart *{animation:none!important} }
 
 
+
+/* ---------- الدور والفريق تحت الاسم ---------- */
+.rchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.rchip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:12.5px;font-weight:800;line-height:1.3;border:1px solid var(--line);max-width:100%}
+.rchip i{font-style:normal;font-size:12px}
+.r-role{color:var(--blue);background:color-mix(in srgb,var(--blue) 9%,var(--card));border-color:color-mix(in srgb,var(--blue) 30%,var(--line))}
+.r-team{color:var(--purple);background:color-mix(in srgb,var(--purple) 9%,var(--card));border-color:color-mix(in srgb,var(--purple) 30%,var(--line))}
+.attwho{display:flex;gap:12px;align-items:center;margin:4px 0 14px;padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+.attwho b{font-size:16px}
+.attwho .rchips{margin-top:6px}
 /* ---------- «متصل الآن»: كلمة خضرا جنب الاسم + نفس النبض الأخضر حوالين الصورة ---------- */
 .onl{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;color:var(--green);white-space:nowrap;vertical-align:middle;margin-inline-start:4px}
 .onl::before{content:"";width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(57,255,20,.7);animation:onlDot 3s ease-in-out infinite}
@@ -1175,7 +1185,7 @@ function startApp(){
     $('login').classList.add('hidden'); $('app').classList.remove('hidden');
     $('tbTeam').textContent = b.settings.TEAM_NAME || 'NERIC';
     $('tbProject').textContent = 'NERIC - ' + (b.settings.PROJECT_NAME || '');
-    $('tbName').textContent = b.me.name; $('tbRole').textContent = b.me.role;
+    $('tbName').textContent = b.me.name; $('tbRole').textContent = b.me.title || b.me.role;
     buildNav(); loadAvatars();
     var h = (location.hash || '').replace('#','');
     var qc = null; try { qc = new URLSearchParams(location.search).get('chat'); } catch(e){}
@@ -1193,6 +1203,14 @@ function refreshBoot(){ return call('bootstrap').then(function(b){ S.boot = b; l
  *  التنقل
  * =========================================================== */
 function role(){ return S.boot ? S.boot.me.role : ''; }
+/** الدور والفريق تحت الاسم (شارتين) */
+function roleChips(p, extra){
+  if (!p) return '';
+  var t = p.title || p.role || '', tm = p.team || '';
+  if (!t && !tm) return '';
+  return '<div class="rchips' + (extra ? ' ' + extra : '') + '">' + (t ? '<span class="rchip r-role"><i aria-hidden="true">💼</i>' + esc(t) + '</span>' : '') +
+    (tm ? '<span class="rchip r-team"><i aria-hidden="true">👥</i>' + esc(tm) + '</span>' : '') + '</div>';
+}
 function isMgr(){ return role() === 'مدير' || role() === 'مشرف'; }
 function isOwner(){ return !!(S.boot && S.boot.isOwner); }
 function isQM(){ return !!(S.boot && S.boot.isQM); }
@@ -1238,7 +1256,7 @@ function buildNav(){
     '<a data-act="logout" style="margin-top:14px;color:var(--red)"><span class="ic">⎋</span>تسجيل خروج</a>';
   $('side').innerHTML = side;
   $('topnav').innerHTML = items.map(function(n){ return '<a data-go="'+n.id+'">' + ic(n) + esc(n.t) + nb(n) + '</a>'; }).join('');
-  $('drawer').innerHTML = '<div class="dme"><button type="button" class="dme-av" data-act="avatar" aria-label="تغيير صورتي">' + avatarHTML(S.boot.me.email, 'lg') + '<i>📷</i></button><div><b>'+esc(S.boot.me.name)+'</b><div class="sub" style="margin:0">'+esc(S.boot.me.role)+' — '+esc(S.boot.me.email)+'</div><button type="button" class="btn sm" data-act="avatar" style="margin-top:6px">📷 صورتي الشخصية</button></div></div>' + side;
+  $('drawer').innerHTML = '<div class="dme"><button type="button" class="dme-av" data-act="avatar" aria-label="تغيير صورتي">' + avatarHTML(S.boot.me.email, 'lg') + '<i>📷</i></button><div><b>'+esc(S.boot.me.name)+'</b><div class="sub" style="margin:0">'+esc(S.boot.me.title || S.boot.me.role)+(S.boot.me.team ? ' — ' + esc(S.boot.me.team) : '')+'</div><button type="button" class="btn sm" data-act="avatar" style="margin-top:6px">📷 صورتي الشخصية</button></div></div>' + side;
   $('tbAv').innerHTML = avatarHTML(S.boot.me.email, 'sm');
   $('tbAv').onclick = function(){ openAvatarForm(); };
   $('bottom').innerHTML = items.filter(function(n){ return n.b; }).map(function(n){
@@ -1761,7 +1779,7 @@ function applyDashStyle(st){
 function stylePickerHTML(){ return ''; }   // اختيار الشكل اتشال — المظهر ثابت C
 VIEWS.dashboard = function(){
   var v = $('view');
-  v.innerHTML = '<div class="dhero"><div class="dhead"><div><h1 class="page">لوحة المتابعة</h1><p class="sub hello" style="margin:0">أهلًا ' + esc(B().me.name) + (B().me.code ? ' (' + esc(B().me.code) + ')' : '') + ' <button type="button" class="helloav" data-act="avatar" title="صورتي الشخصية" aria-label="صورتي الشخصية">' + avatarHTML(B().me.email, 'md') + '</button></p></div><span class="sp"></span>' + stylePickerHTML() + '</div>' +
+  v.innerHTML = '<div class="dhero"><div class="dhead"><div><h1 class="page">لوحة المتابعة</h1><p class="sub hello" style="margin:0">أهلًا ' + esc(B().me.name) + (B().me.code ? ' (' + esc(B().me.code) + ')' : '') + ' <button type="button" class="helloav" data-act="avatar" title="صورتي الشخصية" aria-label="صورتي الشخصية">' + avatarHTML(B().me.email, 'md') + '</button></p>' + roleChips(B().me) + '</div><span class="sp"></span>' + stylePickerHTML() + '</div>' +
     quickHTML() + '<div id="myatt"></div></div><div id="dash">' + loadingHTML() + '</div>';
   wireQuick();
   Array.prototype.forEach.call(document.querySelectorAll('[data-style]'), function(b){
@@ -2022,6 +2040,8 @@ VIEWS.att = function(){
   var techs = (B().people || []).filter(function(x){ return x.role !== 'مشاهد' && (!qm || x.isQ || x.email === B().me.email); });
   v.innerHTML = '<div class="row"><div><h1 class="page">الحضور</h1><p class="sub">' + (own ? 'حضور الفريق كله — اختار يوم أو شهر، وفني معين أو الكل' : qm ? 'حضورك وحضور فنيين الجودة — اختار يوم أو شهر، وفني معين أو الكل' : 'حضورك وانصرافك انت بس — أي يوم أو أي شهر فات') + '</p></div><span class="sp"></span>' +
     ((own || qm) ? '<button class="btn primary" id="addAtt">+ تسجيل لفني</button>' : '') + '</div>' +
+    (function(){ var pp = who ? ((B().people || []).filter(function(x){ return x.email === who; })[0] || (who === B().me.email ? B().me : null)) : null;
+      return pp ? '<div class="attwho">' + avatarHTML(pp.email, 'sm') + '<div><b>' + esc(pp.name) + (pp.code ? ' <span class="sub">(' + esc(pp.code) + ')</span>' : '') + '</b>' + roleChips(pp) + '</div></div>' : ''; })() +
     '<div id="myatt2"></div>' +
     '<div class="filters">' +
       '<div class="f">العرض<select id="aMode"><option value="day"' + (mode === 'day' ? ' selected' : '') + '>يوم</option><option value="month"' + (mode === 'month' ? ' selected' : '') + '>شهر كامل</option></select></div>' +
@@ -2601,7 +2621,7 @@ function startChatPoll(){
   CHAT.poll = setInterval(tick, 45000); setTimeout(tick, 1500);
 }
 function chatName(id){ if (id === 'ALL') return 'الدردشة العامة'; var p = (B().people || []).filter(function(x){ return x.email === id; })[0]; return p ? p.name : id; }
-function chatSub(id){ if (id === 'ALL') return 'كل الفريق'; var p = (B().people || []).filter(function(x){ return x.email === id; })[0]; return p ? [p.code, p.role, p.team].filter(Boolean).join(' · ') : ''; }
+function chatSub(id){ if (id === 'ALL') return 'كل الفريق'; var p = (B().people || []).filter(function(x){ return x.email === id; })[0]; return p ? [p.code, p.title || p.role, p.team].filter(Boolean).join(' · ') : ''; }
 function chatTime(t){ if (!t) return ''; var d = t.slice(0, 10), hm = t.slice(11, 16); return d === today() ? hm : d.slice(5).replace('-', '/') + ' ' + hm; }
 function chatEsc(t){ return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>'); }
 VIEWS.chat = function(p){
@@ -3275,7 +3295,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202610291114').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202610291159').catch(function(){}); });
 </script>
 </body>
 </html>
