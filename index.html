@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202610291159"></script>
+<script src="config.js?v=202611041631"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -473,9 +473,11 @@ table.tbl{width:100%;border-collapse:collapse;font-size:14px}
 .tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px}
 .tabs button{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:7px 14px;font-weight:700;cursor:pointer;white-space:nowrap}
 .tabs button.on{background:var(--blue);border-color:var(--blue);color:#fff}
-.grid-edit input,.grid-edit select{width:100%;min-width:110px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.grid-edit input,.grid-edit select{min-width:56px;max-width:none;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);box-sizing:border-box}
+body.wide-page main{max-width:none}
+.grid-edit th{white-space:nowrap}
 .grid-edit td{padding:5px 6px}
-.grid-edit input[dir=ltr]{min-width:220px;text-align:left}
+.grid-edit input[dir=ltr]{text-align:left}
 .myatt{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .myatt .big{font-size:20px;font-weight:800}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -1244,7 +1246,7 @@ function navItems(){
     { id:'att', t:'الحضور', ic: ICO_CHECK, b:1 },
     { id:'chat', t:'الدردشة', ic:'💬', b:1 }
   ];
-  if (r !== 'مشاهد') items.push({ id:'reports', t:'التقارير', ic:'📑' });
+  if (isOwner()) items.push({ id:'reports', t:'التقارير', ic:'📑' });   // التقارير للمسؤول بس
   if (r === 'مدير') items.push({ id:'settings', t:'الإعدادات', ic:'⚙️' });
   return items;
 }
@@ -1281,6 +1283,7 @@ $('refreshBtn').onclick = function(){ refreshBoot().then(function(){ go(S.view, 
 
 function go(view, params){
   S.view = view; S.params = params || {};
+  document.body.classList.toggle('wide-page', view === 'settings');   // الإعدادات بعرض الشاشة كله علشان الجداول
   try { history.replaceState(null, '', '#' + view); } catch(e){}
   document.querySelectorAll('[data-go]').forEach(function(a){ a.classList.toggle('on', a.dataset.go === view); });
   window.scrollTo(0,0);
@@ -3054,7 +3057,7 @@ VIEWS.board = function(){
 
 /* ---------- التقارير ---------- */
 VIEWS.reports = function(){
-  if (role() === 'مشاهد'){ $('view').innerHTML = emptyHTML('الصفحة دي مش متاحة لحساب المشاهدة', ''); return; }
+  if (!isOwner()){ $('view').innerHTML = emptyHTML('التقارير للمسؤول بس', ''); return; }
   var v = $('view'), p = S.params;
   var from = p.from || addDays(today(), -6), to = p.to || today();
   var lines = []; (B().stations || []).forEach(function(s){ if (lines.indexOf(s.line) < 0) lines.push(s.line); });
@@ -3126,7 +3129,7 @@ function tableHTML(heads, rows){
 
 /* ---------- إعدادات المصنع ---------- */
 var ADMIN_TABS = [
-  { k:'users', t:'المستخدمين', help:'كل شخص هيدخل الموقع لازم يبقى له صف هنا: البريد، الاسم، كود الفني (بيظهر جنب اسمه في كل القوائم)، الدور. فنيين الجودة: اكتب في «الفريق» كلمة «فني جودة» (مدير / مشرف / فني / مشاهد)، ورمز الدخول اللي هتديهوله. لإيقاف حد غيّر حالة الحساب لـ «موقوف».' },
+  { k:'users', t:'المستخدمين', help:'كل شخص هيدخل الموقع لازم يبقى له صف هنا: البريد، الاسم، كود الفني (بيظهر جنب اسمه في كل القوائم)، الدور والفريق (من القايمة)، ورمز الدخول اللي هتديهوله. الدور هو المسمى الوظيفي (زي «مشرف إنتاج» أو «فني جودة»)، وفريق الجودة = «فريق الجودة - Quality Team». لإيقاف حد غيّر حالة الحساب لـ «موقوف».' },
   { k:'stations', t:'المحطات', help:'محطات خطوط التجميع. «يسمح بأكثر من عمل» = لا معناها الموقع مش هيقبل شغلين جاريين في نفس المحطة. «أقصى عدد أعمال» لو عايز حد معين. لإضافة خطوط الإسكندرية ضيف محطات بخط 4 أو 5.' },
   { k:'steps', t:'خطوات الكهرباء', help:'خطوات أعمال الكهرباء لكل محطة. «أنواع العربات» اكتب فيها مثلًا DTC, MC1 أو الكل. الخطوات دي بتظهر كاختيارات في نموذج تسجيل العمل.' },
   { k:'cars', t:'العربات', help:'العربات ومكانها الحالي. المكان بيتحدث تلقائي مع تسجيل العمل، وممكن تعدله هنا أو من لوحة الخطوط.' },
@@ -3191,6 +3194,7 @@ function renderGrid(g){
     '<div class="row" style="margin-top:12px"><button class="btn" id="gAdd">+ صف جديد</button><span class="sp"></span><button class="btn primary" id="gSave">حفظ التغييرات</button></div>' +
     '<div id="gMsg" style="margin-top:10px"></div>';
   $('adm').innerHTML = h;
+  fitGridColumns(cols);
   function collect(){
     var rows = g.rows.map(function(r){ return r.slice(); });
     Array.prototype.forEach.call(document.querySelectorAll('#adm [data-r]'), function(el){
@@ -3211,6 +3215,32 @@ function renderGrid(g){
     }).then(function(){ buildNav(); document.querySelectorAll('[data-go]').forEach(function(a){ a.classList.toggle('on', a.dataset.go === 'settings'); }); })
       .catch(function(e){ $('gSave').disabled = false; $('gSave').textContent = 'حفظ التغييرات'; $('gMsg').innerHTML = '<div class="form-msg err">'+esc(e.message)+'</div>'; });
   };
+}
+
+/** كل عمود في جداول الإعدادات بياخد عرض أطول كلام فيه (العنوان والقيم والاختيارات) — علشان كل خلية تبان كاملة */
+function fitGridColumns(cols){
+  var table = document.querySelector('#adm .grid-edit'); if (!table) return;
+  var probe = table.querySelector('input,select'); if (!probe) return;
+  var cs = getComputedStyle(probe), ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+  var thFont = getComputedStyle(table.querySelector('th'));
+  var MAX = 560;   // قيمة طويلة جدًا (زي صورة) مابتفرّدش الجدول كله
+  cols.forEach(function(c){
+    var els = table.querySelectorAll('[data-c="' + c.key + '"]'); if (!els.length) return;
+    var w = 0;
+    Array.prototype.forEach.call(els, function(el){
+      var texts = [el.value || ''];
+      if (el.tagName === 'SELECT') Array.prototype.forEach.call(el.options, function(o){ texts.push(o.text); });
+      texts.forEach(function(t){ w = Math.max(w, ctx.measureText(String(t)).width); });
+      if (el.value && ctx.measureText(el.value).width > MAX) el.title = el.value;
+    });
+    ctx.font = thFont.fontWeight + ' ' + thFont.fontSize + ' ' + thFont.fontFamily;
+    var hw = ctx.measureText(c.label).width;
+    ctx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+    var extra = els[0].tagName === 'SELECT' ? 40 : (c.numeric ? 34 : 22);
+    var px = Math.ceil(Math.min(MAX, Math.max(w + extra, hw + 4, 56)));
+    Array.prototype.forEach.call(els, function(el){ el.style.width = px + 'px'; });
+  });
 }
 
 /* =============================================================
@@ -3295,7 +3325,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202610291159').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611041631').catch(function(){}); });
 </script>
 </body>
 </html>
