@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611041631"></script>
+<script src="config.js?v=202611100927"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -694,6 +694,7 @@ body.wide-page main{max-width:none}
 .citem.on{background:var(--blue-l)}
 .cav{flex:0 0 42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff;background:linear-gradient(135deg,#3b82f6,#6d28d9)}
 .cav.all{background:linear-gradient(135deg,#0a5cff,#06b6d4);font-size:20px}
+.cav.all.q{background:linear-gradient(135deg,#7c3aed,#db2777)}
 .cmeta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .ctop,.cbot{display:flex;align-items:center;gap:8px}
 .ctop b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px}
@@ -946,6 +947,10 @@ body.ds-C{background:var(--bg)!important}
 /* 📑 صفحة بتتقلب */
 .ni-reports i{animation:niFlip 3.4s ease-in-out infinite}
 @keyframes niFlip{0%,60%,100%{transform:perspective(60px) rotateY(0)}80%{transform:perspective(60px) rotateY(180deg)}}
+/* 🔎 عدسة الجودة بتتحرك كأنها بتفحص */
+.ni-quality i{animation:niScan 3s ease-in-out infinite}
+@keyframes niScan{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(-3px,-2px) rotate(-12deg)}50%{transform:translate(2px,1px) rotate(6deg)}75%{transform:translate(-1px,2px) rotate(-4deg)}}
+.ni-qreports i{animation:niFlip 3.4s ease-in-out infinite;animation-delay:.6s}
 /* ⚡ وميض كهربا */
 .ni-prod i{animation:niZap 2.2s steps(1,end) infinite}
 @keyframes niZap{0%,100%{filter:drop-shadow(0 0 0 rgba(250,204,21,0));transform:scale(1)}8%{filter:drop-shadow(0 0 6px rgba(250,204,21,.95));transform:scale(1.18)}12%{filter:none;transform:scale(1)}16%{filter:drop-shadow(0 0 8px rgba(250,204,21,1));transform:scale(1.12)}22%{filter:none;transform:scale(1)}}
@@ -954,6 +959,13 @@ body.ds-C{background:var(--bg)!important}
 
 
 
+
+/* ---------- الوقت الإضافي (لون بنفسجي مختلف عن باقي الحالات) ---------- */
+.chip.c-ot{background:color-mix(in srgb,#7c3aed 13%,var(--card));color:#6d28d9;border:1px solid color-mix(in srgb,#7c3aed 40%,var(--line));font-weight:800}
+:root[data-theme="dark"] .chip.c-ot{color:#c4b5fd}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .chip.c-ot{color:#c4b5fd} }
+.item.att-ot{border-inline-start:4px solid #7c3aed;background:linear-gradient(270deg,var(--card) 65%,color-mix(in srgb,#7c3aed 9%,var(--card)))}
+.ot-sum{margin-top:8px;font-size:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 /* ---------- الدور والفريق تحت الاسم ---------- */
 .rchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .rchip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:12.5px;font-weight:800;line-height:1.3;border:1px solid var(--line);max-width:100%}
@@ -1216,6 +1228,10 @@ function roleChips(p, extra){
 function isMgr(){ return role() === 'مدير' || role() === 'مشرف'; }
 function isOwner(){ return !!(S.boot && S.boot.isOwner); }
 function isQM(){ return !!(S.boot && S.boot.isQM); }
+/** الشخص ده من فريق الجودة؟ */
+function isQSide(){ return !!(S.boot && S.boot.side === 'quality'); }
+/** صفحة الشغل بتاعتي: «الإنتاج» أو «الجودة» */
+function workView(){ return isQSide() && !isOwner() ? 'quality' : 'prod'; }
 function canHarness(){ return !!(S.boot && S.boot.canHarness); }
 function hwCode(){ return (S.boot && S.boot.harness && S.boot.harness.code) || 'HW'; }
 function hwLine(){ return (S.boot && S.boot.harness && S.boot.harness.line) || 'H'; }
@@ -1240,13 +1256,17 @@ function navItems(){
   var items = [
     { id:'dashboard', t:'لوحة المتابعة', ic: ICO_CHART, b:1 },
     { id:'board', t:'لوحة الخطوط', ic:'🚄', b:1 },
-    { id:'prod', t:'الإنتاج', ic:'⚡', b:1 },
     { id:'stop', t:'التوقفات', ic:'⏸️' },
     { id:'issue', t:'المشكلات', ic:'⚠️' },
     { id:'att', t:'الحضور', ic: ICO_CHECK, b:1 },
     { id:'chat', t:'الدردشة', ic:'💬', b:1 }
   ];
-  if (isOwner()) items.push({ id:'reports', t:'التقارير', ic:'📑' });   // التقارير للمسؤول بس
+  // «الإنتاج» لفريق الإنتاج و«الجودة» لفريق الجودة — والمسؤول الاتنين
+  var qSide = isQSide(), own = isOwner(), at = 2;
+  if (!qSide || own) items.splice(at++, 0, { id:'prod', t:'الإنتاج', ic:'⚡', b:1 });
+  if (qSide || own) items.splice(at++, 0, { id:'quality', t:'الجودة', ic:'🔎', b: qSide ? 1 : 0 });
+  if (own) items.push({ id:'reports', t:'تقارير الإنتاج', ic:'📑' });          // تقارير الإنتاج للمسؤول بس
+  if (B().canQReports) items.push({ id:'qreports', t:'تقارير الجودة', ic:'🧾' });   // تقارير الجودة: المسؤول ومشرف الجودة
   if (r === 'مدير') items.push({ id:'settings', t:'الإعدادات', ic:'⚙️' });
   return items;
 }
@@ -1682,6 +1702,7 @@ function submitForm(entity, F, rec, onSaved, confirmed){
     formMsg('علشان تقفل المشكلة اكتب الإجراء أو الحل.'); return;
   }
   $('fsave').disabled = true; $('fsave').textContent = 'جاري الحفظ...';
+  if (entity === 'prod' && (S.view === 'quality' || S.view === 'prod') && !data.side) data.side = S.view === 'quality' ? 'quality' : 'prod';   // المسؤول بيسجّل من صفحة الجودة ← ملف الجودة
   call('save', { entity: entity, record: data }).then(function(res){
     closeModal();
     toast((res.mode === 'متابعة' ? 'اتسجل في صف جديد كمتابعة للمهمة' : 'تم الحفظ') + (res.warnings && res.warnings.length ? ' — ' + res.warnings.join(' ') : ''), 'ok');
@@ -1830,7 +1851,7 @@ function renderDash(d){
     (d.issues.urgentList.length ? '<div class="list">' + d.issues.urgentList.map(function(r){ return issueItem(r); }).join('') + '</div>' : emptyHTML('مفيش مشكلات عاجلة', '')) + '</div>';
   h += '</div>';
   if (d.carryOver && d.carryOver.length){
-    h += '<div class="sec-title"><h2>شغل جاري من أيام فاتت — محتاج متابعة</h2><button class="btn sm" data-go="prod">الإنتاج</button></div>' +
+    h += '<div class="sec-title"><h2>شغل جاري من أيام فاتت — محتاج متابعة</h2><button class="btn sm" data-go="' + workView() + '">' + (workView() === 'quality' ? 'الجودة' : 'الإنتاج') + '</button></div>' +
       '<div class="sub" style="margin-top:-4px">لما تكمّل شغل منهم دوس «متابعة الشغل النهارده» — هيتسجل في صف جديد بتاريخ النهارده.</div>' +
       '<div class="list">' + d.carryOver.map(prodItem).join('') + '</div>';
   }
@@ -1874,7 +1895,7 @@ function myAttHTML(a){
       '<button class="btn green" id="btnOut" style="padding:14px 26px;font-size:17px">تسجيل انصراف</button>';
   } else {
     h += '<div><div class="big">' + statusChip(a.status) + ' ' + (a.in ? 'من ' + esc(a.in) + ' إلى ' + esc(a.out) : '') + '</div><div class="sub" style="margin:0">' +
-      (a.hours ? 'ساعات العمل: ' + esc(a.hours) + ' — ' : '') + esc(a.approval || '') + '</div></div>';
+      (a.hours ? 'ساعات العمل: ' + esc(a.hours) + ' — ' : '') + esc(a.approval || '') + '</div>' + (Number(a.overtime) > 0 ? '<div style="margin-top:6px">' + otChip(a.overtime) + '</div>' : '') + '</div>';
   }
   return h + '</div></div>';
 }
@@ -1923,10 +1944,13 @@ function issueItem(r){
     '<div class="m">' + (r.station ? '<span>📍 ' + esc(stationLabel(r.station)) + (r.slot ? ' — ' + esc(slotLabel(r.slot)) : '') + '</span>' : '') + (r.car ? '<span>🚇 ' + esc(r.car) + '</span>' : '') +
     '<span>📅 ' + esc(r.date) + (r.due ? ' — الموعد: ' + esc(r.due) : '') + '</span>' + (r.owner ? '<span>👤 ' + esc(withCodes(r.owner, r.ownerCode)) + '</span>' : '') + (r.reporter ? '<span>📣 ' + esc(withCodes(r.reporter, r.reporterCode)) + '</span>' : '') + '</div></div>';
 }
+/** دقايق ← «3 س» / «1 س 30 د» / «45 د» */
+function fmtOt(m){ m = Math.round(Number(m) || 0); var h = Math.floor(m / 60), d = m % 60; return (h ? h + ' س' : '') + (h && d ? ' ' : '') + (d || !h ? d + ' د' : ''); }
+function otChip(m){ return Number(m) > 0 ? '<span class="chip c-ot" title="وقت إضافي بعد نهاية الوردية">⏱ إضافي ' + fmtOt(m) + '</span>' : ''; }
 function attItem(r){
   ITEM_CACHE[r.id] = { e:'att', r:r };
-  var ac = r.empCode || codeOfName(r.name);
-  return '<div class="item" data-item="'+esc(r.id)+'"><div class="t">' + esc(r.name) + (ac ? ' <span class="chip c-blue">' + esc(ac) + '</span>' : '') + ' ' + statusChip(r.status) + ' ' + statusChip(r.approval) + '</div>' +
+  var ac = r.empCode || codeOfName(r.name), ot = Number(r.overtime) > 0;
+  return '<div class="item' + (ot ? ' att-ot' : '') + '" data-item="'+esc(r.id)+'"><div class="t">' + esc(r.name) + (ac ? ' <span class="chip c-blue">' + esc(ac) + '</span>' : '') + ' ' + statusChip(r.status) + ' ' + otChip(r.overtime) + ' ' + statusChip(r.approval) + '</div>' +
     '<div class="m"><span>📅 ' + esc(r.date) + '</span>' + (r.in ? '<span>دخول ' + esc(r.in) + '</span>' : '') + (r.out ? '<span>انصراف ' + esc(r.out) + '</span>' : '') +
     (r.late ? '<span>تأخير ' + esc(r.late) + ' د</span>' : '') + (r.early ? '<span>انصراف مبكر ' + esc(r.early) + ' د</span>' : '') +
     (r.hours ? '<span>' + esc(r.hours) + ' ساعة</span>' : '') + '<span>' + esc(r.source || '') + '</span></div>' +
@@ -1998,7 +2022,7 @@ function listView(entity, cfg){
     go(S.view, { from: $('fFrom').value, to: $('fTo').value, status: $('fStatus').value, station: $('fSt').value, q: $('fQ').value.trim(), openOnly: $('fOpen') ? $('fOpen').checked : false });
   };
   $('fQ').onkeydown = function(e){ if (e.key === 'Enter') $('fGo').click(); };
-  call('list', { entity: entity, from: from, to: to, openOnly: openOnly }).then(function(res){
+  call('list', { entity: entity, from: from, to: to, openOnly: openOnly, side: cfg.side || '' }).then(function(res){
     var rows = res.rows.filter(function(r){
       if (p.status && r.status !== p.status) return false;
       if (p.station && r.station !== p.station) return false;
@@ -2016,7 +2040,7 @@ function listView(entity, cfg){
       C = C.concat([['createdName','سجّله'],['createdCode','كود المسجل'],['createdAt','وقت التسجيل'],['id','المعرف']]);
       var cols = C.map(function(c){ return { k: c[0], t: c[1] }; });
       downloadCSV(cfg.title + ' ' + from + ' إلى ' + to, cols.map(function(c){ return c.t; }), rows.map(function(r){ return cols.map(function(c){ return r[c.k]; }); }),
-        'NERIC-' + ({ prod: 'Production', stop: 'Stops', issue: 'Issues' }[entity] || entity) + '_' + from + '_' + to);
+        'NERIC-' + (cfg.side === 'quality' ? 'Quality' : ({ prod: 'Production', stop: 'Stops', issue: 'Issues' }[entity] || entity)) + '_' + from + '_' + to);
     };
     var head = '<div class="sub">عدد السجلات: ' + rows.length + (res.total > res.rows.length ? ' (بيتعرض آخر 500 بس — ضيّق الفترة)' : '') + '</div>';
     $('lst').innerHTML = head + (rows.length ? '<div class="list">' + rows.map(cfg.item).join('') + '</div>' :
@@ -2024,7 +2048,15 @@ function listView(entity, cfg){
     wireItems();
   }).catch(function(e){ $('lst').innerHTML = emptyHTML('مش قادر أحمّل السجلات', e.message); });
 }
-VIEWS.prod = function(){ listView('prod', { title:'الإنتاج', sub:'سجلات أعمال الكهرباء في صالون العربة حسب المحطة والعربة', add:'سجل عمل', statuses: B().status.prod, item: prodItem, days: 6, openLabel:'اعرض كل الشغل الجاري' }); };
+VIEWS.prod = function(){
+  if (isQSide() && !isOwner()){ go('quality', S.params); return; }
+  listView('prod', { side:'prod', title:'الإنتاج', sub:'سجلات أعمال الكهرباء في صالون العربة حسب المحطة والعربة', add:'سجل عمل', statuses: B().status.prod, item: prodItem, days: 6, openLabel:'اعرض كل الشغل الجاري' });
+};
+/* صفحة «الجودة»: شغل فريق الجودة وورشة تجهيز الضفائر (من ملف الجودة) — لفريق الجودة والمسؤول بس */
+VIEWS.quality = function(){
+  if (!isQSide() && !isOwner()){ $('view').innerHTML = emptyHTML('الصفحة دي لفريق الجودة بس', ''); return; }
+  listView('prod', { side:'quality', title:'الجودة', sub:'أعمال فريق الجودة وورشة تجهيز الضفائر', add:'سجل عمل جودة', statuses: B().status.prod, item: prodItem, days: 6, openLabel:'اعرض كل الشغل الجاري' });
+};
 VIEWS.stop = function(){ listView('stop', { title:'التوقفات', sub:'سجل توقفات الإنتاج وأسبابها ومدتها', add:'بلاغ توقف', statuses: B().status.stop, item: stopItem, days: 6, openLabel:'اعرض كل المفتوح', openDefault: true }); };
 VIEWS.issue = function(){ listView('issue', { title:'المشكلات', sub:'مشكلات الإنتاج وأولويتها والمسؤول عن حلها', add:'مشكلة', statuses: B().status.issue, item: issueItem, days: 29, openLabel:'اعرض كل المفتوح', openDefault: true }); };
 
@@ -2064,12 +2096,14 @@ VIEWS.att = function(){
   }
   call('list', { entity: 'att', from: from, to: to, email: who }).then(function(res){
     var rows = res.rows;
-    var sum = { 'حاضر':0,'متأخر':0,'غائب':0,'أجازة':0,'مرضي':0,'إذن / مأمورية':0 }, late = 0, early = 0, hours = 0;
-    rows.forEach(function(r){ sum[r.status] = (sum[r.status]||0) + 1; late += Number(r.late)||0; early += Number(r.early)||0; hours += Number(r.hours)||0; });
+    var sum = { 'حاضر':0,'متأخر':0,'غائب':0,'أجازة':0,'مرضي':0,'إذن / مأمورية':0 }, late = 0, early = 0, hours = 0, otMin = 0, otDays = 0;
+    rows.forEach(function(r){ sum[r.status] = (sum[r.status]||0) + 1; late += Number(r.late)||0; early += Number(r.early)||0; hours += Number(r.hours)||0;
+      if (Number(r.overtime) > 0){ otMin += Number(r.overtime); otDays++; } });
     var whoName = (own || qm) ? (who ? (techs.filter(function(x){ return x.email === who; })[0] || {}).name || who : (qm ? 'فنيين الجودة' : 'الكل')) : B().me.name;
     var h = '<div class="card" style="margin-bottom:12px"><div class="row" style="margin-bottom:8px"><b>' + esc(label) + ' — ' + esc(whoName) + '</b><span class="sp"></span><span class="chip">' + rows.length + ' تسجيل</span></div>' +
       '<div class="row">' + ['حاضر','متأخر','غائب','أجازة','مرضي','إذن / مأمورية'].map(function(k){ return statusChip(k).replace('</span>', '<span class="cnt">&nbsp;:&nbsp;' + (sum[k]||0) + '</span></span>'); }).join(' ') + '</div>' +
-      '<div class="sub" style="margin:8px 0 0">إجمالي ساعات العمل: <b>' + (Math.round(hours * 10) / 10) + '</b> — دقائق التأخير: <b>' + late + '</b> — دقائق الانصراف المبكر: <b>' + early + '</b></div></div>';
+      '<div class="sub" style="margin:8px 0 0">إجمالي ساعات العمل: <b>' + (Math.round(hours * 10) / 10) + '</b> — دقائق التأخير: <b>' + late + '</b> — دقائق الانصراف المبكر: <b>' + early + '</b></div>' +
+      (otMin ? '<div class="ot-sum"><span class="chip c-ot">⏱ وقت إضافي</span> <b>' + fmtOt(otMin) + '</b> في ' + otDays + (otDays === 1 ? ' يوم' : ' أيام') + '</div>' : '') + '</div>';
     var pend = rows.filter(function(r){ return r.approval === 'بانتظار الاعتماد' && canApprove(r); });
     if ((own || qm) && pend.length) h += '<div class="row" style="margin-bottom:10px"><span class="chip c-amber">بانتظار الاعتماد : ' + pend.length + '</span><button class="btn sm green" id="apprAll">اعتماد الكل</button></div>';
     h += rows.length ? '<div class="list">' + rows.map(attItem).join('') + '</div>' : emptyHTML('مفيش تسجيلات حضور', 'في ' + label + (own && who ? ' للفني ده' : '') + '.');
@@ -2081,7 +2115,7 @@ VIEWS.att = function(){
         .catch(function(e){ toast(e.message, 'err'); });
     };
     if ($('aCsv')) $('aCsv').onclick = function(){
-      var cols = [['empCode','كود الفني'],['date','التاريخ'],['name','اسم الفني'],['shift','الوردية'],['status','حالة الحضور'],['in','وقت الدخول'],['out','وقت الانصراف'],['late','دقائق التأخير'],['early','انصراف مبكر'],['hours','الساعات'],['approval','الاعتماد'],['notes','الملاحظات']];
+      var cols = [['empCode','كود الفني'],['date','التاريخ'],['name','اسم الفني'],['shift','الوردية'],['status','حالة الحضور'],['in','وقت الدخول'],['out','وقت الانصراف'],['late','دقائق التأخير'],['early','انصراف مبكر'],['hours','الساعات'],['overtime','الوقت الإضافي (دقيقة)'],['approval','الاعتماد'],['notes','الملاحظات']];
       var wc = who ? ((techs.filter(function(x){ return x.email === who; })[0] || {}).code || 'tech') : 'All';
       downloadCSV('الحضور ' + label + ' — ' + whoName, cols.map(function(c){ return c[1]; }), rows.map(function(r){ return cols.map(function(c){ return r[c[0]]; }); }),
         'NERIC-Attendance_' + (mode === 'month' ? month : day) + '_' + wc);
@@ -2515,7 +2549,7 @@ function loadAvatars(){
 function avHue(id){ var h = 0; String(id).split('').forEach(function(c){ h = (h * 31 + c.charCodeAt(0)) % 360; }); return h; }
 function avatarHTML(email, cls){
   cls = cls ? ' ' + cls : '';
-  if (email === 'ALL') return AV.map.ALL ? '<span class="cav has all' + cls + '" data-av="ALL"><img src="' + AV.map.ALL + '" alt=""></span>' : '<span class="cav all' + cls + '" data-av="ALL">👥</span>';
+  if (isGroupChat(email)) return AV.map[email] ? '<span class="cav has all' + cls + '" data-av="' + email + '"><img src="' + AV.map[email] + '" alt=""></span>' : '<span class="cav all' + (email === 'QUALITY' ? ' q' : '') + cls + '" data-av="' + email + '">' + (email === 'QUALITY' ? '🔎' : '👥') + '</span>';
   var d = AV.map[email];
   if (d) return '<span class="cav has' + cls + '" data-av="' + esc(email) + '"><img src="' + d + '" alt=""></span>';
   var p = (B().people || []).filter(function(x){ return x.email === email; })[0];
@@ -2552,9 +2586,9 @@ function shrinkImage(file, max, square, q){
 function openAvatarForm(email){
   email = email || B().me.email;
   var has = !!AV.map[email];
-  var isAll = email === 'ALL';
-  openModal(isAll ? 'صورة الدردشة العامة' : 'صورتي الشخصية', '<div id="fmsg"></div><div class="avedit"><div id="avPrev">' + avatarHTML(email, 'xl') + '</div>' +
-    '<div class="sub" style="text-align:center;margin:10px 0 0">' + (isAll ? 'الصورة دي بتظهر للكل على الدردشة العامة — وانت بس اللي تقدر تغيّرها.' : 'الصورة بتظهر لكل الفريق في الدردشة وجنب اسمك. اختار صورة واضحة لوشّك — هتتقص مربع لوحدها.') + '</div></div>' +
+  var isAll = isGroupChat(email);
+  openModal(isAll ? 'صورة ' + chatName(email) : 'صورتي الشخصية', '<div id="fmsg"></div><div class="avedit"><div id="avPrev">' + avatarHTML(email, 'xl') + '</div>' +
+    '<div class="sub" style="text-align:center;margin:10px 0 0">' + (isAll ? 'الصورة دي بتظهر على ' + chatName(email) + ' — وانت بس اللي تقدر تغيّرها.' : 'الصورة بتظهر لكل الفريق في الدردشة وجنب اسمك. اختار صورة واضحة لوشّك — هتتقص مربع لوحدها.') + '</div></div>' +
     '<input type="file" id="avFile" accept="image/*" hidden>',
     '<button class="btn primary" id="avPick">📷 اختار صورة</button>' + (has ? '<button class="btn danger" id="avDel">حذف الصورة</button>' : '') + '<button class="btn" id="avClose">إغلاق</button>');
   $('avClose').onclick = closeModal;
@@ -2564,7 +2598,7 @@ function openAvatarForm(email){
     call('setAvatar', { email: email, data: data }).then(function(x){
       if (data) AV.map[email] = data; else delete AV.map[email];
       AV.ver = x.ver; if (S.boot) S.boot.avatarsVer = x.ver; try { store('neric_av_v1', JSON.stringify(AV)); } catch(e){}
-      refreshAvatars(); closeModal(); toast(data ? (isAll ? 'تم تغيير صورة الدردشة العامة' : 'تم تغيير صورتك') : 'اتمسحت الصورة', 'ok');
+      refreshAvatars(); closeModal(); toast(data ? (isAll ? 'تم تغيير صورة ' + chatName(email) : 'تم تغيير صورتك') : 'اتمسحت الصورة', 'ok');
     }).catch(function(e){ $('avPick').disabled = false; $('avPick').textContent = '📷 اختار صورة'; formMsg(e.message); });
   }
   $('avFile').onchange = function(){
@@ -2623,8 +2657,13 @@ function startChatPoll(){
   }
   CHAT.poll = setInterval(tick, 45000); setTimeout(tick, 1500);
 }
-function chatName(id){ if (id === 'ALL') return 'الدردشة العامة'; var p = (B().people || []).filter(function(x){ return x.email === id; })[0]; return p ? p.name : id; }
-function chatSub(id){ if (id === 'ALL') return 'كل الفريق'; var p = (B().people || []).filter(function(x){ return x.email === id; })[0]; return p ? [p.code, p.title || p.role, p.team].filter(Boolean).join(' · ') : ''; }
+/* دردشتين جماعيتين: «ALL» = الإنتاج (فيها الرسايل القديمة) و«QUALITY» = الجودة — المسؤول بيشوف الاتنين */
+var GROUP_NAMES = { ALL: 'دردشة الإنتاج', QUALITY: 'دردشة الجودة' };
+function isGroupChat(id){ return id === 'ALL' || id === 'QUALITY'; }
+function myGroups(){ return (B().chatGroups && B().chatGroups.length) ? B().chatGroups : ['ALL']; }
+function groupMembers(g){ return (B().people || []).filter(function(p){ return p.owner || (g === 'QUALITY' ? p.side === 'quality' : p.side !== 'quality'); }); }
+function chatName(id){ if (isGroupChat(id)) return GROUP_NAMES[id]; var p = (B().people || []).filter(function(x){ return x.email === id; })[0]; return p ? p.name : id; }
+function chatSub(id){ if (isGroupChat(id)) return id === 'QUALITY' ? 'فريق الجودة' : 'فريق الإنتاج'; var p = (B().people || []).filter(function(x){ return x.email === id; })[0]; return p ? [p.code, p.title || p.role, p.team].filter(Boolean).join(' · ') : ''; }
 function chatTime(t){ if (!t) return ''; var d = t.slice(0, 10), hm = t.slice(11, 16); return d === today() ? hm : d.slice(5).replace('-', '/') + ' ' + hm; }
 function chatEsc(t){ return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>'); }
 VIEWS.chat = function(p){
@@ -2651,27 +2690,29 @@ function fitChat(){
   var top = w.getBoundingClientRect().top + window.scrollY;
   w.style.height = Math.max(380, window.innerHeight - top - bh - 14) + 'px';
 }
-function chatPaneEmpty(){ return '<div class="cempty"><div style="font-size:46px">💬</div><b>اختار محادثة</b><span>الدردشة العامة بتوصل لكل الفريق، والخاصة بتبقى بينك وبين الشخص بس.</span></div>'; }
+function chatPaneEmpty(){ return '<div class="cempty"><div style="font-size:46px">💬</div><b>اختار محادثة</b><span>الدردشة الجماعية بتوصل لفريقك كله، والخاصة بتبقى بينك وبين الشخص بس.</span></div>'; }
 function renderChatList(){
   var q = ($('cSearch') && $('cSearch').value || '').trim();
   var by = {}; CHAT.convs.forEach(function(c){ by[c.id] = c; });
   var people = (B().people || []).filter(function(x){ return x.email !== B().me.email; });
-  var ids = ['ALL'].concat(people.map(function(x){ return x.email; }));
-  Object.keys(by).forEach(function(k){ if (ids.indexOf(k) < 0) ids.push(k); });
-  ids = ids.filter(function(id){ return id === 'ALL' || !q || chatName(id).indexOf(q) >= 0 || chatSub(id).indexOf(q) >= 0; });   // العامة متثبتة دايمًا
+  var groups = myGroups();
+  var ids = groups.concat(people.map(function(x){ return x.email; }));
+  Object.keys(by).forEach(function(k){ if (ids.indexOf(k) < 0 && !isGroupChat(k)) ids.push(k); });
+  ids = ids.filter(function(id){ return isGroupChat(id) || !q || chatName(id).indexOf(q) >= 0 || chatSub(id).indexOf(q) >= 0; });   // العامة متثبتة دايمًا
   ids.sort(function(a, b){
-    if (a === 'ALL') return -1; if (b === 'ALL') return 1;
+    var ga = groups.indexOf(a), gb = groups.indexOf(b);   // الجماعية متثبتة فوق
+    if (ga >= 0 || gb >= 0) return (ga < 0 ? 99 : ga) - (gb < 0 ? 99 : gb);
     var ta = by[a] && by[a].last ? by[a].last.ts : 0, tb = by[b] && by[b].last ? by[b].last.ts : 0;
     return tb - ta || chatName(a).localeCompare(chatName(b), 'ar');
   });
   $('cItems').innerHTML = ids.length ? ids.map(function(id){
     var c = by[id], last = c && c.last;
     var body = last ? ((last.file ? (isImgType(last.file.type) ? '📷 صورة' : (/^audio\//.test(last.file.type || '') ? '🎤 رسالة صوتية' : '📎 ' + last.file.name)) + (last.text ? ' — ' : '') : '') + (last.text || '')) : '';
-    var prev = last ? (last.from === B().me.email ? 'انت: ' : (id === 'ALL' ? last.fromName + ': ' : '')) + body : (id === 'ALL' ? 'ابدأ الكلام مع الفريق كله' : chatSub(id));
-    var onl = id !== 'ALL' && isOnline(id);
-    return '<button class="citem' + (id === 'ALL' ? ' pin' : '') + (id === CHAT.with ? ' on' : '') + (c && c.unread ? ' un' : '') + (onl ? ' online' : '') + '" data-chat="' + esc(id) + '">' +
+    var prev = last ? (last.from === B().me.email ? 'انت: ' : (isGroupChat(id) ? last.fromName + ': ' : '')) + body : (isGroupChat(id) ? 'ابدأ الكلام مع ' + chatSub(id) : chatSub(id));
+    var onl = !isGroupChat(id) && isOnline(id);
+    return '<button class="citem' + (isGroupChat(id) ? ' pin' : '') + (id === CHAT.with ? ' on' : '') + (c && c.unread ? ' un' : '') + (onl ? ' online' : '') + '" data-chat="' + esc(id) + '">' +
       avatarHTML(id) +
-      '<span class="cmeta"><span class="ctop"><b>' + esc(chatName(id)) + (id === 'ALL' ? ' <span class="cpin" title="متثبتة">📌</span>' : '') + (onl ? ' <span class="onl">متصل الآن</span>' : '') + '</b><time>' + (last ? chatTime(last.time) : '') + '</time></span>' +
+      '<span class="cmeta"><span class="ctop"><b>' + esc(chatName(id)) + (isGroupChat(id) ? ' <span class="cpin" title="متثبتة">📌</span>' : '') + (onl ? ' <span class="onl">متصل الآن</span>' : '') + '</b><time>' + (last ? chatTime(last.time) : '') + '</time></span>' +
       '<span class="cbot"><span class="cprev">' + esc(prev.replace(/\s+/g, ' ')) + '</span>' + (c && c.unread ? '<span class="cun">' + c.unread + '</span>' : '') + '</span></span></button>';
   }).join('') : '<div class="sub" style="padding:14px">مفيش نتايج.</div>';
   Array.prototype.forEach.call(document.querySelectorAll('[data-chat]'), function(b){ b.onclick = function(){ openChat(b.dataset.chat); }; });
@@ -2680,23 +2721,23 @@ function renderChatList(){
 /* ---------- «متصل الآن» ---------- */
 function isOnline(email){ return (CHAT.online || []).indexOf(email) >= 0; }
 function onlineSub(id){
-  if (id === 'ALL'){ var me = B().me.email, n = (CHAT.online || []).filter(function(e){ return e !== me; }).length; return n ? '<span class="onl">' + n + (n === 1 ? ' متصل' : (n === 2 ? ' متصلين' : ' متصلين')) + ' الآن</span>' : ''; }
+  if (isGroupChat(id)){ var me = B().me.email, mem = groupMembers(id).map(function(p){ return p.email; }), n = (CHAT.online || []).filter(function(e){ return e !== me && mem.indexOf(e) >= 0; }).length; return n ? '<span class="onl">' + n + (n === 1 ? ' متصل' : (n === 2 ? ' متصلين' : ' متصلين')) + ' الآن</span>' : ''; }
   return isOnline(id) ? '<span class="onl">متصل الآن</span>' : '';
 }
 function paintPaneOnline(){
   var h = document.querySelector('.cpane-h'), id = CHAT.with; if (!h || !id) return;
-  h.classList.toggle('online', id !== 'ALL' && isOnline(id));
+  h.classList.toggle('online', !isGroupChat(id) && isOnline(id));
   var o = $('cOnl'); if (o) o.innerHTML = onlineSub(id);
 }
 function openChat(id, keep){
   CHAT.with = id; if (!keep) CHAT.msgs = [];
   $('chatwrap').classList.add('open');
   $('cPane').innerHTML = '<div class="cpane-h"><button class="icon-btn cback" id="cBack" aria-label="رجوع">→</button>' + avatarHTML(id) +
-    '<div><b>' + esc(chatName(id)) + '</b><div class="sub" style="margin:0"><span id="cOnl">' + onlineSub(id) + '</span>' + esc(chatSub(id)) + (id === 'ALL' ? '' : ' — محادثة خاصة') + '</div></div>' +
-    (id === 'ALL' && isOwner() ? '<span class="sp"></span><button type="button" class="btn sm cgrp" id="cGrpPic" title="تغيير صورة الدردشة العامة" aria-label="تغيير صورة الدردشة العامة">📷<span> صورة الدردشة</span></button>' : '') + '</div>' +
+    '<div><b>' + esc(chatName(id)) + '</b><div class="sub" style="margin:0"><span id="cOnl">' + onlineSub(id) + '</span>' + esc(chatSub(id)) + (isGroupChat(id) ? '' : ' — محادثة خاصة') + '</div></div>' +
+    (isGroupChat(id) && isOwner() ? '<span class="sp"></span><button type="button" class="btn sm cgrp" id="cGrpPic" title="تغيير صورة الدردشة" aria-label="تغيير صورة الدردشة العامة">📷<span> صورة الدردشة</span></button>' : '') + '</div>' +
     '<div class="cmsgs" id="cMsgs">' + loadingHTML() + '</div>' +
     ('<div class="catt hidden" id="cAtt"></div><form class="cform" id="cForm"><button type="button" class="icon-btn cclip" id="cClip" title="صورة أو ملف" aria-label="إرفاق صورة أو ملف">📎</button><input type="file" id="cFile" hidden><input type="file" id="cAudio" accept="audio/*" capture hidden><textarea id="cText" rows="1" maxlength="1000" placeholder="اكتب رسالة..." autocomplete="off"></textarea><button class="cact mic" id="cSend" type="submit" aria-label="تسجيل رسالة صوتية">' + ICO_MIC + ICO_SEND + '</button></form>');
-  if ($('cGrpPic')) $('cGrpPic').onclick = function(){ openAvatarForm('ALL'); };
+  if ($('cGrpPic')) $('cGrpPic').onclick = function(){ openAvatarForm(id); };
   $('cBack').onclick = function(){ CHAT.with = null; $('chatwrap').classList.remove('open'); $('cPane').innerHTML = chatPaneEmpty(); renderChatList(); };
   var ta = $('cText');
   ta.addEventListener('input', function(){ ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 140) + 'px'; });
@@ -2736,7 +2777,7 @@ function refreshChat(first){
 function renderMsgs(jump){
   var box = $('cMsgs'); if (!box) return;
   var atEnd = jump || box.scrollHeight - box.scrollTop - box.clientHeight < 80;
-  var me = B().me.email, lastDay = '', lastFrom = '', group = CHAT.with === 'ALL';
+  var me = B().me.email, lastDay = '', lastFrom = '', group = isGroupChat(CHAT.with);
   if (!CHAT.msgs.length){ box.innerHTML = '<div class="cempty sm"><b>مفيش رسايل لسه</b><span>اكتب أول رسالة تحت 👇</span></div>'; return; }
   box.innerHTML = CHAT.msgs.map(function(m){
     var day = (m.time || '').slice(0, 10), h = '';
@@ -3003,7 +3044,7 @@ function openPushForm(){
     var body = $('pushBody'); if (!body) return;
     var foot = $('mfoot'), btns = '';
     var info = {
-      on: '<div class="pstat ok">✅ <b>الإشعارات شغالة على الجهاز ده</b></div><p class="sub">أي رسالة جديدة في الدردشة العامة أو رسالة خاصة ليك هتوصلك إشعار على الموبايل حتى والتطبيق مقفول. لما تدوس على الإشعار هيفتحلك المحادثة على طول.</p>',
+      on: '<div class="pstat ok">✅ <b>الإشعارات شغالة على الجهاز ده</b></div><p class="sub">أي رسالة جديدة في دردشة فريقك أو رسالة خاصة ليك هتوصلك إشعار على الموبايل حتى والتطبيق مقفول. لما تدوس على الإشعار هيفتحلك المحادثة على طول.</p>',
       off: '<div class="pstat">🔕 <b>الإشعارات مقفولة على الجهاز ده</b></div><p class="sub">شغّلها علشان أي رسالة جديدة في الدردشة توصلك على الموبايل زي واتساب — حتى والتطبيق مقفول. الموبايل هيسألك «السماح بالإشعارات» — دوس <b>سماح</b>.</p>',
       denied: '<div class="pstat bad">⛔ <b>الإشعارات مرفوضة على الجهاز ده</b></div><p class="sub">انت (أو الموبايل) رفضت الإشعارات قبل كدا. علشان ترجّعها:</p><ol class="psteps"><li>افتح <b>الإعدادات</b> في الموبايل ← <b>التطبيقات</b> ← <b>NERIC</b> (أو Chrome).</li><li>ادخل <b>الإشعارات</b> وخليها <b>مسموحة</b>.</li><li>ارجع هنا ودوس «تشغيل الإشعارات».</li></ol>',
       'ios-install': '<div class="pstat">📱 <b>على الآيفون: ضيف التطبيق للشاشة الرئيسية الأول</b></div><p class="sub">آبل بتسمح بالإشعارات بس للتطبيق اللي على الشاشة الرئيسية (iOS 16.4 أو أحدث):</p><ol class="psteps"><li>افتح لينك التطبيق من <b>Safari</b>.</li><li>دوس زرار <b>المشاركة</b> ⬆️ تحت.</li><li>اختار <b>«إضافة إلى الشاشة الرئيسية»</b> ← <b>إضافة</b>.</li><li>افتح <b>NERIC</b> من الأيقونة الجديدة، وادخل الدردشة ودوس 🔔.</li></ol>',
@@ -3056,19 +3097,23 @@ VIEWS.board = function(){
 };
 
 /* ---------- التقارير ---------- */
-VIEWS.reports = function(){
-  if (!isOwner()){ $('view').innerHTML = emptyHTML('التقارير للمسؤول بس', ''); return; }
+/* «تقارير الإنتاج» (ملف الإنتاج — للمسؤول بس) و«تقارير الجودة» (ملف الجودة — للمسؤول ومشرف الجودة) */
+VIEWS.reports = function(){ reportsView('prod'); };
+VIEWS.qreports = function(){ reportsView('quality'); };
+function reportsView(side){
+  var isQ = side === 'quality';
+  if (isQ ? !B().canQReports : !isOwner()){ $('view').innerHTML = emptyHTML(isQ ? 'تقارير الجودة للمسؤول ومشرف الجودة بس' : 'تقارير الإنتاج للمسؤول بس', ''); return; }
   var v = $('view'), p = S.params;
   var from = p.from || addDays(today(), -6), to = p.to || today();
   var lines = []; (B().stations || []).forEach(function(s){ if (lines.indexOf(s.line) < 0) lines.push(s.line); });
-  v.innerHTML = '<h1 class="page">التقارير</h1><p class="sub">ملخصات الفترة — كل رقم محسوب من السجلات المتسجلة في الشيت</p>' +
+  v.innerHTML = '<h1 class="page">' + (isQ ? 'تقارير الجودة' : 'تقارير الإنتاج') + '</h1><p class="sub">ملخصات الفترة من ' + (isQ ? 'ملف الجودة' : 'ملف الإنتاج') + ' — كل رقم محسوب من السجلات المتسجلة في الشيت</p>' +
     '<div class="filters"><div class="f">من<input type="date" id="rFrom" value="'+from+'"></div><div class="f">إلى<input type="date" id="rTo" value="'+to+'"></div>' +
     '<div class="f">الخط<select id="rLine"><option value="">الكل</option>' + lines.sort().map(function(l){ return '<option'+(String(p.line)===String(l)?' selected':'')+'>'+esc(l)+'</option>'; }).join('') + '</select></div>' +
     '<div class="f">المحطة<select id="rSt"><option value="">الكل</option>' + stationOptions(false).map(function(o){ return '<option value="'+esc(o.v)+'"'+(p.station===o.v?' selected':'')+'>'+esc(o.t)+'</option>'; }).join('') + '</select></div>' +
     '<button class="btn primary" id="rGo">عرض التقرير</button></div><div id="rep">' + loadingHTML('جاري حساب التقرير...') + '</div>';
-  $('rGo').onclick = function(){ go('reports', { from: $('rFrom').value, to: $('rTo').value, line: $('rLine').value, station: $('rSt').value }); };
-  call('report', { from: from, to: to, line: p.line || '', station: p.station || '' }).then(renderReport).catch(function(e){ $('rep').innerHTML = emptyHTML('مش قادر أحسب التقرير', e.message); });
-};
+  $('rGo').onclick = function(){ go(S.view, { from: $('rFrom').value, to: $('rTo').value, line: $('rLine').value, station: $('rSt').value }); };
+  call('report', { side: side, from: from, to: to, line: p.line || '', station: p.station || '' }).then(renderReport).catch(function(e){ $('rep').innerHTML = emptyHTML('مش قادر أحسب التقرير', e.message); });
+}
 function renderReport(r){
   S.lastReport = r;
   var h = '<div class="grid g4">' + kpi('سجلات العمل', r.prod.count, 'من ' + r.from + ' إلى ' + r.to) +
@@ -3076,7 +3121,7 @@ function renderReport(r){
     kpi('المشكلات المفتوحة', r.issues.open, 'من ' + r.issues.total + ' في الفترة — متأخرة (كل الفترات): ' + r.issues.overdue) +
     kpi('متوسط زمن حل المشكلة', r.issues.avgDays === '' ? '—' : r.issues.avgDays + ' يوم', 'محسوب من المشكلات المقفولة في الفترة (' + r.issues.closed + ')') + '</div>';
 
-  h += secT('الإنتاج حسب المحطة', 'csvProd');
+  h += secT(r.side === 'quality' ? 'شغل الجودة حسب المحطة' : 'الإنتاج حسب المحطة', 'csvProd');
   h += r.prod.rows.length ? tableHTML(['المحطة','الخط','عدد السجلات','مكتمل','نسبة المكتمل'], r.prod.rows.map(function(x){
     return [stationLabel(x.station), x.line, x.count, x.completed, x.count ? Math.round(x.completed / x.count * 100) + '%' : '—']; })) : emptyHTML('مفيش سجلات عمل في الفترة', '');
   h += '<div class="sub" style="margin-top:6px">نسبة المكتمل = السجلات المكتملة ÷ كل سجلات المحطة في الفترة × 100.</div>';
@@ -3087,7 +3132,7 @@ function renderReport(r){
 
   if (r.quality){
     var q = r.quality;
-    h += '<div class="sec-title"><h2>الجودة — ورشة الضفائر وفنيين الجودة</h2><span class="chip c-purple">ليك' + (isOwner() ? ' ولمسؤول الجودة' : '') + ' بس</span></div>' +
+    h += '<div class="sec-title"><h2>الجودة — ورشة الضفائر وفنيين الجودة</h2><span class="chip c-purple">ليك ولمشرف الجودة بس</span></div>' +
       '<div class="grid g4">' +
       kpi('شغل ورشة الضفائر', q.harness.logs, 'مكتمل: ' + q.harness.completed + ' — جاري: ' + q.harness.running, 'k1', 'prod') +
       kpi('شغل فنيين الجودة على الخطوط', q.lines.logs, 'مكتمل: ' + q.lines.completed, 'k2', 'logs') +
@@ -3095,9 +3140,9 @@ function renderReport(r){
       kpi('مشكلات الورشة', q.issues.open, 'مفتوحة من ' + q.issues.total + ' — عدد فنيين الجودة: ' + q.techCount, 'k4', 'alert') + '</div>';
   }
   if (r.showPeople !== false){
-  h += secT(isQM() && !isOwner() ? 'حضور فنيين الجودة' : 'حضور الفنيين', 'csvAtt');
-  h += r.people.length ? tableHTML(['الكود','الفني','حاضر','متأخر','دقائق التأخير','غائب','أجازة','مرضي','إذن / مأمورية','انصراف مبكر (د)','الساعات','سجلات عمل','مكتمل','بانتظار اعتماد'], r.people.map(function(x){
-    var c = x.stats; return [x.code || '—', x.name, c.present, c.late, c.lateMin, c.absent, c.leave, c.sick || 0, c.permit, c.earlyMin, c.hours, c.logs, c.completed, c.pending]; })) : emptyHTML('مفيش فنيين نشطين', 'ضيفهم من «إعدادات المصنع ← المستخدمين» بدور «فني».');
+  h += secT(r.side === 'quality' ? 'حضور فنيين الجودة' : 'حضور فنيين الإنتاج', 'csvAtt');
+  h += r.people.length ? tableHTML(['الكود','الفني','حاضر','متأخر','دقائق التأخير','غائب','أجازة','مرضي','إذن / مأمورية','انصراف مبكر (د)','الساعات','الوقت الإضافي','سجلات عمل','مكتمل','بانتظار اعتماد'], r.people.map(function(x){
+    var c = x.stats; return [x.code || '—', x.name, c.present, c.late, c.lateMin, c.absent, c.leave, c.sick || 0, c.permit, c.earlyMin, c.hours, c.otMin ? fmtOt(c.otMin) + ' (' + c.otDays + ' يوم)' : '—', c.logs, c.completed, c.pending]; })) : emptyHTML('مفيش فنيين نشطين', 'ضيفهم من «إعدادات المصنع ← المستخدمين» بدور «فني».');
   }
 
   if (r.showEval){
@@ -3114,9 +3159,9 @@ function renderReport(r){
   }
   $('rep').innerHTML = h;
   var tag = r.from + ' إلى ' + r.to;
-  bindCsv('csvProd', 'الإنتاج حسب المحطة ' + tag, ['المحطة','الخط','عدد السجلات','مكتمل','نسبة المكتمل %'], r.prod.rows.map(function(x){ return [x.station, x.line, x.count, x.completed, x.count ? Math.round(x.completed / x.count * 100) : '']; }));
+  bindCsv('csvProd', (r.side === 'quality' ? 'شغل الجودة حسب المحطة ' : 'الإنتاج حسب المحطة ') + tag, ['المحطة','الخط','عدد السجلات','مكتمل','نسبة المكتمل %'], r.prod.rows.map(function(x){ return [x.station, x.line, x.count, x.completed, x.count ? Math.round(x.completed / x.count * 100) : '']; }));
   bindCsv('csvStop', 'التوقفات حسب السبب ' + tag, ['السبب','العدد','المدة (دقيقة)','مفتوح'], r.stops.rows.map(function(x){ return [x.reason, x.count, x.minutes, x.open]; }));
-  bindCsv('csvAtt', 'حضور الفنيين ' + tag, ['الكود','الفني','حاضر','متأخر','دقائق التأخير','غائب','أجازة','مرضي','إذن / مأمورية','انصراف مبكر','الساعات','سجلات عمل','مكتمل'], r.people.map(function(x){ var c = x.stats; return [x.code, x.name, c.present, c.late, c.lateMin, c.absent, c.leave, c.sick || 0, c.permit, c.earlyMin, c.hours, c.logs, c.completed]; }));
+  bindCsv('csvAtt', (r.side === 'quality' ? 'حضور فنيين الجودة ' : 'حضور فنيين الإنتاج ') + tag, ['الكود','الفني','حاضر','متأخر','دقائق التأخير','غائب','أجازة','مرضي','إذن / مأمورية','انصراف مبكر','الساعات','الوقت الإضافي (دقيقة)','أيام الإضافي','سجلات عمل','مكتمل'], r.people.map(function(x){ var c = x.stats; return [x.code, x.name, c.present, c.late, c.lateMin, c.absent, c.leave, c.sick || 0, c.permit, c.earlyMin, c.hours, c.otMin || 0, c.otDays || 0, c.logs, c.completed]; }));
   if (r.showEval) bindCsv('csvEval', 'التقييم المقترح ' + tag, ['الفني','الحضور %','المواعيد %','العمل %','الدرجة الإرشادية','أساس الحساب'], r.people.map(function(x){ return [x.name, x.eval.attend, x.eval.punct, x.eval.work, x.eval.score, x.eval.basis]; }));
 }
 function secT(t, csvId){ return '<div class="sec-title"><h2>'+esc(t)+'</h2>' + (isAdmin() ? '<button class="btn sm" id="'+csvId+'">تنزيل Excel</button>' : '') + '</div>'; }
@@ -3325,7 +3370,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611041631').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611100927').catch(function(){}); });
 </script>
 </body>
 </html>
