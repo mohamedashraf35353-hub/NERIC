@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611100927"></script>
+<script src="config.js?v=202611101131"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1017,6 +1017,69 @@ body.ds-C{background:var(--bg)!important}
 .ds-C .kpi .val{text-shadow:0 0 18px color-mix(in srgb,var(--kc) 45%,transparent)}
 .ds-C .ki{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--kc) 55%,transparent),0 0 16px -4px var(--kc)}
 .ds-C .kpi{box-shadow:0 8px 30px -14px rgba(15,23,42,.25),-6px 0 18px -10px var(--kc)}
+
+/* ---------- الأجازات ---------- */
+.lvbox{grid-column:1/-1;border:1.5px solid var(--blue);border-radius:16px;padding:14px;background:color-mix(in srgb,var(--blue) 5%,var(--card));animation:lvIn .25s ease backwards}
+@keyframes lvIn{from{opacity:0;transform:translateY(-6px)}}
+.lvbox h4{margin:0 0 10px;font-size:15px;font-weight:800}
+.lvtypes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.lvt{min-height:52px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font:inherit;font-weight:800;font-size:15.5px;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:transform .12s,border-color .15s,box-shadow .15s,background .15s}
+.lvt small{font-size:11.5px;font-weight:600;color:var(--muted)}
+.lvt:hover{border-color:var(--blue)}
+.lvt:active{transform:scale(.97)}
+.lvt.on{border-color:var(--blue);background:var(--blue);color:#fff;box-shadow:0 4px 14px color-mix(in srgb,var(--blue) 35%,transparent)}
+.lvt.on small{color:#dbe7ff}
+.lvdates{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.lvdates label{display:block;font-size:13px;font-weight:700;margin-bottom:4px}
+.lvdates input{width:100%}
+.lvinfo{margin-top:12px;font-size:14px;display:flex;flex-direction:column;gap:8px}
+.lvmsg{padding:10px 12px;border-radius:12px;font-weight:700;font-size:14px;background:var(--gray-l);color:var(--text)}
+.lvmsg.ok{background:var(--green-l);color:var(--green)}
+.lvmsg.warn{background:var(--amber-l);color:var(--amber)}
+.lvmsg.bad{background:var(--red-l);color:var(--red)}
+.lvcard{margin-bottom:14px}
+.lvhead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.lvhead h3{margin:0;font-size:18px;font-weight:900}
+.lvyear{font-size:14px;color:var(--muted);font-weight:700}
+.lvgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lvtile{border:1.5px solid color-mix(in srgb,var(--blue) 35%,var(--line));border-radius:14px;padding:12px 8px;text-align:center;background:var(--card);animation:lvIn .35s ease backwards}
+.lvtile:nth-child(2){animation-delay:.045s}.lvtile:nth-child(3){animation-delay:.09s}
+.lvtile .k{font-size:14px;font-weight:800;color:var(--muted)}
+.lvtile .n{font-size:34px;font-weight:900;line-height:1.15;margin-top:2px;color:var(--blue)}
+.lvtile .of{font-size:12.5px;color:var(--muted);font-weight:700}
+.lvtile .pend{color:var(--amber);margin-top:4px}
+.lvbar{height:7px;border-radius:99px;background:var(--gray-l);overflow:hidden;margin:8px 6px 0}
+.lvbar i{display:block;height:100%;background:var(--blue);border-radius:inherit}
+.lvtile.low .n{color:#ff7a00}.lvtile.low .lvbar i{background:#ff7a00}
+.lvtile.out{border-color:#ff1744;box-shadow:0 0 6px 1px rgba(255,23,68,.35),inset 0 0 10px rgba(255,23,68,.08)}
+.lvtile.out .n{color:#ff1744}
+.lvtile.none{border-style:dashed;border-color:var(--line)}
+.lvtile.none .n{color:var(--muted);font-size:26px}
+.lvfoot{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.lvwhich{font-weight:600}
+.lvbreak{margin-top:8px;gap:6px;align-items:center}
+.lvsum{margin:-4px 0 10px;gap:8px}
+.lvwho{display:flex;align-items:center;gap:10px}
+.lvwt{min-width:0;flex:1}
+.lvname{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:15px}
+.lvteam{font-size:12.5px;color:var(--muted);margin-top:2px}
+.lvminis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.lvmini{display:flex;flex-direction:column;align-items:center;padding:7px 4px;border-radius:10px;border:1px solid var(--line);background:var(--bg)}
+.lvmini b{font-size:20px;font-weight:900;color:var(--blue);line-height:1.1}
+.lvmini small{font-size:12px;font-weight:800;color:var(--text)}
+.lvmini small.of{font-weight:600;color:var(--muted);font-size:11.5px}
+.lvmini small.pend{color:var(--amber);font-size:11px}
+.lvmini.low b{color:#ff7a00}
+.lvmini.out{border-color:#ff1744;box-shadow:0 0 5px rgba(255,23,68,.35)}.lvmini.out b{color:#ff1744}
+.lvmini.none b{color:var(--muted)}
+.lvmini.unp b{color:var(--text)}
+.lvday .t{display:flex;align-items:center;gap:8px}
+@media(min-width:900px){.lvlist{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+.lvdays b{font-size:16px}
+@media(max-width:560px){.lvtypes{grid-template-columns:repeat(2,1fr)}.lvtile .n{font-size:30px}.lvgrid{gap:8px}}
+:root[data-theme="dark"] .lvtile.out{box-shadow:0 0 8px 1px rgba(255,45,85,.6),inset 0 0 12px rgba(255,45,85,.15)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .lvtile.out{box-shadow:0 0 8px 1px rgba(255,45,85,.6),inset 0 0 12px rgba(255,45,85,.15)}}
+@media (prefers-reduced-motion: reduce){.lvbox,.lvtile{animation:none}}
 </style>
 </head>
 <body>
@@ -1265,6 +1328,7 @@ function navItems(){
   var qSide = isQSide(), own = isOwner(), at = 2;
   if (!qSide || own) items.splice(at++, 0, { id:'prod', t:'الإنتاج', ic:'⚡', b:1 });
   if (qSide || own) items.splice(at++, 0, { id:'quality', t:'الجودة', ic:'🔎', b: qSide ? 1 : 0 });
+  if (canWrite()) items.splice(items.map(function(n){ return n.id; }).indexOf('att') + 1, 0, { id:'leave', t:'الأجازات', ic:'🏖️' });
   if (own) items.push({ id:'reports', t:'تقارير الإنتاج', ic:'📑' });          // تقارير الإنتاج للمسؤول بس
   if (B().canQReports) items.push({ id:'qreports', t:'تقارير الجودة', ic:'🧾' });   // تقارير الجودة: المسؤول ومشرف الجودة
   if (r === 'مدير') items.push({ id:'settings', t:'الإعدادات', ic:'⚙️' });
@@ -1522,7 +1586,9 @@ function FORMS(){
       { k:'date', t:'التاريخ', type:'date', req:1, def: today },
       { k:'email', t:'الفني', type:'select', req:1, options: techOptionsByEmail(), full:1 },
       { k:'shift', t:'الوردية', type:'select', options: shiftOpts, hint:'لو سيبتها فاضية هتتاخد وردية الفني الافتراضية' },
-      { k:'status', t:'حالة الحضور', type:'select', req:1, options: opts(st.att), def:'حاضر', hint:'التأخير بيتحسب تلقائي من وقت الدخول' },
+      { k:'status', t:'حالة الحضور', type:'select', req:1, options: opts(st.att), def:'حاضر', hint:'التأخير بيتحسب تلقائي من وقت الدخول — ولو اخترت «أجازة» هتختار نوعها والتاريخ' },
+      { k:'leaveType', t:'نوع الأجازة', type:'hidden' },
+      { k:'toDate', t:'إلى تاريخ', type:'hidden' },
       { k:'in', t:'وقت الدخول', type:'time' },
       { k:'out', t:'وقت الانصراف', type:'time' },
       { k:'approval', t:'الاعتماد', type:'select', options: opts(st.approval), def:'معتمد' },
@@ -1666,6 +1732,7 @@ function openForm(entity, rec, onSaved, opts){
   if (entity === 'prod' || entity === 'stop' || entity === 'issue') { wireSlotField(entity); if (!ro && isNew) wireStationCar(); }
   if (entity === 'prod') wireProdForm();
   if (entity === 'stop' && !ro) wireStopForm();
+  if (entity === 'att') wireAttForm(rec, isNew, ro);
   if (ro) return;
   $('fsave').onclick = function(){ submitForm(entity, F, rec, onSaved, false); };
   if (past) FORM_OPTS.correct = true;
@@ -1679,8 +1746,11 @@ function openForm(entity, rec, onSaved, opts){
 }
 function formMsg(m, t){ $('fmsg').innerHTML = m ? '<div class="form-msg '+(t||'err')+'">'+esc(m)+'</div>' : ''; if (m) $('mbody').scrollTop = 0; }
 
+var FORM_FORCE = false;
 function submitForm(entity, F, rec, onSaved, confirmed){
   var data = { id: rec.id || '' };
+  if (confirmed && FORM_FORCE) data.force = true;
+  FORM_FORCE = false;
   if (entity === 'prod'){
     if (FORM_OPTS.continueFrom) data.continueFrom = FORM_OPTS.continueFrom;
     if (FORM_OPTS.correct) data.correct = true;
@@ -1701,16 +1771,29 @@ function submitForm(entity, F, rec, onSaved, confirmed){
   if (entity === 'issue' && (data.status === 'محلولة' || data.status === 'مغلقة') && !String(data.action).trim()){
     formMsg('علشان تقفل المشكلة اكتب الإجراء أو الحل.'); return;
   }
+  if (entity === 'att'){
+    if (data.status !== 'أجازة'){ data.leaveType = ''; delete data.toDate; }
+    else {
+      if (!data.leaveType){ formMsg('اختار نوع الأجازة.'); return; }
+      if (!data.date){ formMsg('اختار تاريخ الأجازة.'); return; }
+      if (!data.toDate || data.toDate === data.date || rec.id) delete data.toDate;
+      else if (data.toDate < data.date){ formMsg('«إلى تاريخ» لازم يكون بعد «من تاريخ».'); return; }
+      data['in'] = ''; data.out = '';
+    }
+  }
   $('fsave').disabled = true; $('fsave').textContent = 'جاري الحفظ...';
   if (entity === 'prod' && (S.view === 'quality' || S.view === 'prod') && !data.side) data.side = S.view === 'quality' ? 'quality' : 'prod';   // المسؤول بيسجّل من صفحة الجودة ← ملف الجودة
   call('save', { entity: entity, record: data }).then(function(res){
     closeModal();
-    toast((res.mode === 'متابعة' ? 'اتسجل في صف جديد كمتابعة للمهمة' : 'تم الحفظ') + (res.warnings && res.warnings.length ? ' — ' + res.warnings.join(' ') : ''), 'ok');
+    if (entity === 'att' && data.status === 'أجازة') LEAVE_CACHE = {};
+    toast((res.mode === 'متابعة' ? 'اتسجل في صف جديد كمتابعة للمهمة' : res.count ? 'اتسجلت أجازة ' + data.leaveType + ' — ' + res.count + ' أيام' : 'تم الحفظ') + (res.warnings && res.warnings.length ? ' — ' + res.warnings.join(' ') : ''), 'ok');
     var after = function(){ if (onSaved) onSaved(res.record); else go(S.view, S.params); };
     if (entity === 'prod' && data.car) refreshBoot().then(after, after); else after();
   }).catch(function(e){
     $('fsave').disabled = false; $('fsave').textContent = FORM_OPTS.correct ? 'تصحيح السجل ده' : (rec.id ? 'حفظ التعديل' : 'حفظ');
-    formMsg(e.message, e.code === 'CONFLICT' ? 'warn' : 'err');
+    // الرصيد مش كفاية: المسؤول بس يقدر يسجل يدوي فوق الرصيد (بعد تأكيد)
+    if (e.code === 'LEAVE_LOW' && isOwner() && confirm(e.message + '\n\nتسجّلها يدوي فوق الرصيد؟')){ data.force = true; FORM_FORCE = true; submitForm(entity, F, rec, onSaved, true); return; }
+    formMsg(e.message, e.code === 'CONFLICT' || e.code === 'LEAVE_LOW' ? 'warn' : 'err');
   });
 }
 
@@ -1804,7 +1887,7 @@ function stylePickerHTML(){ return ''; }   // اختيار الشكل اتشال
 VIEWS.dashboard = function(){
   var v = $('view');
   v.innerHTML = '<div class="dhero"><div class="dhead"><div><h1 class="page">لوحة المتابعة</h1><p class="sub hello" style="margin:0">أهلًا ' + esc(B().me.name) + (B().me.code ? ' (' + esc(B().me.code) + ')' : '') + ' <button type="button" class="helloav" data-act="avatar" title="صورتي الشخصية" aria-label="صورتي الشخصية">' + avatarHTML(B().me.email, 'md') + '</button></p>' + roleChips(B().me) + '</div><span class="sp"></span>' + stylePickerHTML() + '</div>' +
-    quickHTML() + '<div id="myatt"></div></div><div id="dash">' + loadingHTML() + '</div>';
+    quickHTML() + '<div id="myatt"></div><div id="myleave"></div></div><div id="dash">' + loadingHTML() + '</div>';
   wireQuick();
   Array.prototype.forEach.call(document.querySelectorAll('[data-style]'), function(b){
     b.onclick = function(){
@@ -1873,11 +1956,12 @@ function renderDash(d){
   }
   $('dash').innerHTML = h;
   $('myatt').innerHTML = canWrite() ? myAttHTML(d.myAtt) : '';
+  if ($('myleave') && !$('myleave').dataset.done){ $('myleave').dataset.done = '1'; loadMyLeave($('myleave')); }
   wireMyAtt(); wireItems(); wireBoard(d.board); fixHwGap();
   if ($('recentRefresh')) $('recentRefresh').onclick = function(){ this.disabled = true; call('dashboard', {}).then(function(x){ S.lastDash = x; renderDash(x); toast('تم التحديث'); }).catch(function(e){ toast(e.message, 'err'); }); };
 }
 function attChips(c){
-  return ['حاضر','متأخر','غائب','أجازة','مرضي','إذن / مأمورية','لم يسجل'].map(function(k){
+  return ['حاضر','متأخر','غائب','أجازة','إذن / مأمورية','لم يسجل'].map(function(k){
     return statusChip(k).replace('</span>', '<span class="cnt">&nbsp;:&nbsp;' + (c[k]||0) + '</span></span>');
   }).join(' ');
 }
@@ -1950,7 +2034,7 @@ function otChip(m){ return Number(m) > 0 ? '<span class="chip c-ot" title="وق�
 function attItem(r){
   ITEM_CACHE[r.id] = { e:'att', r:r };
   var ac = r.empCode || codeOfName(r.name), ot = Number(r.overtime) > 0;
-  return '<div class="item' + (ot ? ' att-ot' : '') + '" data-item="'+esc(r.id)+'"><div class="t">' + esc(r.name) + (ac ? ' <span class="chip c-blue">' + esc(ac) + '</span>' : '') + ' ' + statusChip(r.status) + ' ' + otChip(r.overtime) + ' ' + statusChip(r.approval) + '</div>' +
+  return '<div class="item' + (ot ? ' att-ot' : '') + '" data-item="'+esc(r.id)+'"><div class="t">' + esc(r.name) + (ac ? ' <span class="chip c-blue">' + esc(ac) + '</span>' : '') + ' ' + attStatusChip(r) + (r['in'] && isRestDayC(r.date) ? ' <span class="chip c-ot">يوم راحة</span>' : '') + ' ' + otChip(r.overtime) + ' ' + statusChip(r.approval) + '</div>' +
     '<div class="m"><span>📅 ' + esc(r.date) + '</span>' + (r.in ? '<span>دخول ' + esc(r.in) + '</span>' : '') + (r.out ? '<span>انصراف ' + esc(r.out) + '</span>' : '') +
     (r.late ? '<span>تأخير ' + esc(r.late) + ' د</span>' : '') + (r.early ? '<span>انصراف مبكر ' + esc(r.early) + ' د</span>' : '') +
     (r.hours ? '<span>' + esc(r.hours) + ' ساعة</span>' : '') + '<span>' + esc(r.source || '') + '</span></div>' +
@@ -2096,12 +2180,13 @@ VIEWS.att = function(){
   }
   call('list', { entity: 'att', from: from, to: to, email: who }).then(function(res){
     var rows = res.rows;
-    var sum = { 'حاضر':0,'متأخر':0,'غائب':0,'أجازة':0,'مرضي':0,'إذن / مأمورية':0 }, late = 0, early = 0, hours = 0, otMin = 0, otDays = 0;
-    rows.forEach(function(r){ sum[r.status] = (sum[r.status]||0) + 1; late += Number(r.late)||0; early += Number(r.early)||0; hours += Number(r.hours)||0;
+    var sum = { 'حاضر':0,'متأخر':0,'غائب':0,'أجازة':0,'إذن / مأمورية':0 }, lvT = {}, late = 0, early = 0, hours = 0, otMin = 0, otDays = 0;
+    rows.forEach(function(r){ sum[r.status] = (sum[r.status]||0) + 1; if (r.status === 'أجازة') lvT[r.leaveType || 'غير محدد'] = (lvT[r.leaveType || 'غير محدد'] || 0) + 1; late += Number(r.late)||0; early += Number(r.early)||0; hours += Number(r.hours)||0;
       if (Number(r.overtime) > 0){ otMin += Number(r.overtime); otDays++; } });
     var whoName = (own || qm) ? (who ? (techs.filter(function(x){ return x.email === who; })[0] || {}).name || who : (qm ? 'فنيين الجودة' : 'الكل')) : B().me.name;
     var h = '<div class="card" style="margin-bottom:12px"><div class="row" style="margin-bottom:8px"><b>' + esc(label) + ' — ' + esc(whoName) + '</b><span class="sp"></span><span class="chip">' + rows.length + ' تسجيل</span></div>' +
-      '<div class="row">' + ['حاضر','متأخر','غائب','أجازة','مرضي','إذن / مأمورية'].map(function(k){ return statusChip(k).replace('</span>', '<span class="cnt">&nbsp;:&nbsp;' + (sum[k]||0) + '</span></span>'); }).join(' ') + '</div>' +
+      '<div class="row">' + ['حاضر','متأخر','غائب','أجازة','إذن / مأمورية'].map(function(k){ return statusChip(k).replace('</span>', '<span class="cnt">&nbsp;:&nbsp;' + (sum[k]||0) + '</span></span>'); }).join(' ') + '</div>' +
+      (sum['أجازة'] ? '<div class="row lvbreak"><span class="sub" style="margin:0">الأجازات:</span> ' + Object.keys(lvT).map(function(k){ return leaveChip(k).replace('</span>', ' : ' + lvT[k] + '</span>'); }).join(' ') + '</div>' : '') +
       '<div class="sub" style="margin:8px 0 0">إجمالي ساعات العمل: <b>' + (Math.round(hours * 10) / 10) + '</b> — دقائق التأخير: <b>' + late + '</b> — دقائق الانصراف المبكر: <b>' + early + '</b></div>' +
       (otMin ? '<div class="ot-sum"><span class="chip c-ot">⏱ وقت إضافي</span> <b>' + fmtOt(otMin) + '</b> في ' + otDays + (otDays === 1 ? ' يوم' : ' أيام') + '</div>' : '') + '</div>';
     var pend = rows.filter(function(r){ return r.approval === 'بانتظار الاعتماد' && canApprove(r); });
@@ -2115,13 +2200,217 @@ VIEWS.att = function(){
         .catch(function(e){ toast(e.message, 'err'); });
     };
     if ($('aCsv')) $('aCsv').onclick = function(){
-      var cols = [['empCode','كود الفني'],['date','التاريخ'],['name','اسم الفني'],['shift','الوردية'],['status','حالة الحضور'],['in','وقت الدخول'],['out','وقت الانصراف'],['late','دقائق التأخير'],['early','انصراف مبكر'],['hours','الساعات'],['overtime','الوقت الإضافي (دقيقة)'],['approval','الاعتماد'],['notes','الملاحظات']];
+      var cols = [['empCode','كود الفني'],['date','التاريخ'],['name','اسم الفني'],['shift','الوردية'],['status','حالة الحضور'],['leaveType','نوع الأجازة'],['in','وقت الدخول'],['out','وقت الانصراف'],['late','دقائق التأخير'],['early','انصراف مبكر'],['hours','الساعات'],['overtime','الوقت الإضافي (دقيقة)'],['approval','الاعتماد'],['notes','الملاحظات']];
       var wc = who ? ((techs.filter(function(x){ return x.email === who; })[0] || {}).code || 'tech') : 'All';
       downloadCSV('الحضور ' + label + ' — ' + whoName, cols.map(function(c){ return c[1]; }), rows.map(function(r){ return cols.map(function(c){ return r[c[0]]; }); }),
         'NERIC-Attendance_' + (mode === 'month' ? month : day) + '_' + wc);
     };
   }).catch(function(e){ $('attBody').innerHTML = emptyHTML('مش قادر أحمّل الحضور', e.message); });
 };
+
+/* =============================================================
+ *  الأجازات: نوع الأجازة في فورم الحضور + رصيد كل واحد
+ * =========================================================== */
+var LEAVE_CHIP = { 'اعتيادية':'c-purple', 'عارضة':'c-amber', 'مرضي':'c-blue', 'بدون أجر':'' };
+var LEAVE_HINT = { 'اعتيادية':'من الرصيد السنوي', 'عارضة':'ظرف طارئ', 'مرضي':'بعذر طبي', 'بدون أجر':'من غير رصيد' };
+var DAY_AR = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+var LEAVE_CACHE = {};
+/** 2026-11-13 ← «13/11» (يوم/شهر) */
+function dm(d){ var p = String(d).split('-'); return '\u2066' + (+p[2]) + '/' + (+p[1]) + '\u2069'; }
+function isRestDayC(d){ return !!d && ((B().restDays || []).indexOf(dayNameOf(d)) >= 0 || (B().holidays || []).indexOf(d) >= 0); }
+function dayNameOf(d){ var p = String(d).split('-'); return DAY_AR[new Date(+p[0], +p[1]-1, +p[2]).getDay()]; }
+function leaveChip(t){ return '<span class="chip ' + (LEAVE_CHIP[t] || '') + '">' + esc(t || 'غير محدد') + '</span>'; }
+/** حالة الحضور كـ chip — والأجازة معاها نوعها */
+function attStatusChip(r){ return r.status === 'أجازة' ? '<span class="chip ' + (r.leaveType ? (LEAVE_CHIP[r.leaveType] || '') : 'c-purple') + '">أجازة' + (r.leaveType ? ' · ' + esc(r.leaveType) : '') + '</span>' : statusChip(r.status); }
+/** أيام الأجازة في المدة: يوم واحد = نفس اليوم — وأكتر من يوم من غير أيام الراحة والعطلات (زي السيرفر) */
+function leaveSpan(from, to){
+  var days = [], skip = [];
+  if (!from) return { days: days, skip: skip };
+  if (!to || to <= from) return { days: [from], skip: skip };
+  var rest = B().restDays || [], hol = B().holidays || [], d = from, n = 0;
+  while (d <= to && n++ < 62){
+    var dn = dayNameOf(d);
+    if (rest.indexOf(dn) >= 0) skip.push(dn + ' ' + dm(d)); else if (hol.indexOf(d) >= 0) skip.push('عطلة ' + dm(d)); else days.push(d);
+    d = addDays(d, 1);
+  }
+  return { days: days, skip: skip };
+}
+function leaveBalOf(email){
+  if (!email) return Promise.resolve(null);
+  if (!LEAVE_CACHE[email]) LEAVE_CACHE[email] = call('leaveBal', { email: email }).then(function(r){ return r.list[0] || null; }).catch(function(){ delete LEAVE_CACHE[email]; return null; });
+  return LEAVE_CACHE[email];
+}
+
+/** فورم الحضور: «أجازة» ← يفتح تحتها نوع الأجازة + من / إلى + الرصيد */
+function wireAttForm(rec, isNew, ro){
+  var st = $('f_status'); if (!st) return;
+  var lt = $('f_leaveType'), td = $('f_toDate'), fd = $('f_date'), em = $('f_email');
+  var types = (B().status && B().status.leaveTypes) || ['اعتيادية','عارضة','مرضي','بدون أجر'];
+  var box = document.createElement('div'); box.className = 'lvbox'; box.id = 'lvbox';
+  box.innerHTML = '<h4>نوع الأجازة <span class="req">*</span></h4>' +
+    '<div class="lvtypes" role="radiogroup" aria-label="نوع الأجازة">' + types.map(function(t){
+      return '<button type="button" class="lvt" role="radio" data-lt="' + esc(t) + '"' + (ro ? ' disabled' : '') + '>' + esc(t) + '<small>' + esc(LEAVE_HINT[t] || '') + '</small></button>'; }).join('') + '</div>' +
+    '<div class="lvdates"><div><label for="lvFrom">من تاريخ</label><input type="date" id="lvFrom"' + (ro ? ' disabled' : '') + '></div>' +
+    '<div><label for="lvTo">إلى تاريخ</label><input type="date" id="lvTo"' + (ro || !isNew ? ' disabled' : '') + '></div></div>' +
+    '<div class="lvinfo" id="lvInfo"></div>';
+  st.closest('.fld').after(box);
+  var from = $('lvFrom'), to = $('lvTo'), info = $('lvInfo');
+  from.value = fd.value || today(); to.value = isNew ? (td.value || from.value) : from.value;
+  var orig = !isNew && rec.status === 'أجازة' ? { type: rec.leaveType, date: rec.date } : null;
+  var seq = 0;
+  function wrap(id){ var e = $(id); return e ? e.closest('.fld') : null; }
+  function setSave(okay, tip){ var b = $('fsave'); if (b){ b.disabled = !okay; b.title = tip || ''; } }
+  function update(){
+    var on = st.value === 'أجازة', my = ++seq;
+    box.style.display = on ? '' : 'none';
+    ['f_date','f_in','f_out','f_shift'].forEach(function(id){ var w = wrap(id); if (w) w.style.display = on ? 'none' : ''; });
+    Array.prototype.forEach.call(box.querySelectorAll('.lvt'), function(b){ var sel = b.dataset.lt === lt.value; b.classList.toggle('on', sel); b.setAttribute('aria-checked', sel ? 'true' : 'false'); });
+    if (!on){ info.innerHTML = ''; setSave(true); return; }
+    if (to.value && to.value < from.value) to.value = from.value;
+    fd.value = from.value; td.value = isNew && to.value && to.value !== from.value ? to.value : '';
+    var span = leaveSpan(from.value, isNew ? to.value : from.value), n = span.days.length;
+    var h = '<div class="lvdays">📅 <b>' + n + '</b> ' + (n === 1 ? 'يوم' : 'أيام') + ' أجازة' + (span.skip.length ? ' <span class="sub">— من غير: ' + (span.skip.length <= 3 ? esc(span.skip.join('، ')) : span.skip.length + ' أيام راحة وعطلات') + '</span>' : '') + '</div>';
+    if (!n){ info.innerHTML = h + '<div class="lvmsg bad">مفيش أيام شغل في المدة دي.</div>'; setSave(false); return; }
+    if (!lt.value){ info.innerHTML = h + '<div class="lvmsg">اختار نوع الأجازة من فوق.</div>'; setSave(true); return; }
+    if (lt.value === 'بدون أجر'){ info.innerHTML = h + '<div class="lvmsg">«بدون أجر» مالهاش رصيد — بتتعد بس.</div>'; setSave(true); return; }
+    info.innerHTML = h + '<div class="lvmsg sub">جاري حساب الرصيد...</div>';
+    leaveBalOf(em ? em.value : '').then(function(b){
+      if (my !== seq) return;
+      var t = b && b.types.filter(function(x){ return x.type === lt.value; })[0];
+      if (!t){ info.innerHTML = h; setSave(true); return; }
+      if (t.base === null){ info.innerHTML = h + '<div class="lvmsg warn">مفيش رصيد «' + esc(lt.value) + '» متسجل للفني ده لسه — هتتسجل من غير خصم.</div>'; setSave(true); return; }
+      var back = orig && orig.type === lt.value ? 1 : 0;   // تعديل نفس اليوم: مايتحسبش مرتين
+      var avail = t.base - t.used - t.pending + back, after = avail - n;
+      var line = 'رصيد «' + esc(lt.value) + '»: المتبقي <b>' + Math.max(avail, 0) + '</b> من ' + t.base + (t.pending ? ' (و' + t.pending + ' تحت الاعتماد)' : '');
+      if (after >= 0){ info.innerHTML = h + '<div class="lvmsg ok">' + line + ' ← بعد الأجازة: <b>' + after + '</b></div>'; setSave(true); }
+      else if (isOwner()){ info.innerHTML = h + '<div class="lvmsg warn">' + line + ' — الرصيد مش كفاية. لو كمّلت هتتسجل يدوي فوق الرصيد بعد تأكيد.</div>'; setSave(true); }
+      else { info.innerHTML = h + '<div class="lvmsg bad">⛔ ' + esc(B().leaveOutMsg || 'رصيدك خلص') + '</div>'; setSave(false, 'الرصيد خلص'); }
+    });
+  }
+  Array.prototype.forEach.call(box.querySelectorAll('.lvt'), function(b){ b.onclick = function(){ lt.value = b.dataset.lt; update(); }; });
+  st.addEventListener('change', function(){ if (st.value === 'أجازة' && !from.value) from.value = fd.value || today(); update(); });
+  from.addEventListener('change', function(){ if (isNew && (!to.value || to.value < from.value)) to.value = from.value; if (!isNew) to.value = from.value; update(); });
+  to.addEventListener('change', update);
+  if (em) em.addEventListener('change', update);
+  update();
+}
+
+/* ---------- كارت الرصيد ---------- */
+function leaveTileHTML(t){
+  if (t.base === null) return '<div class="lvtile none"><div class="k">' + esc(t.type) + '</div><div class="n">—</div><div class="of">لسه مااتسجلش</div>' + (t.used ? '<div class="of">اتاخد ' + t.used + '</div>' : '') + '</div>';
+  var free = t.left - t.pending, cls = free <= 0 ? ' out' : (free <= 2 ? ' low' : '');
+  var pct = t.base > 0 ? Math.max(0, Math.min(100, t.left / t.base * 100)) : 0;
+  return '<div class="lvtile' + cls + '"><div class="k">' + esc(t.type) + '</div><div class="n" data-count="' + t.left + '">' + t.left + '</div>' +
+    '<div class="of">متبقي من ' + t.base + '</div><div class="lvbar"><i style="width:' + pct + '%"></i></div>' +
+    (t.pending ? '<div class="of pend">' + t.pending + ' تحت الاعتماد</div>' : '') + '</div>';
+}
+function leaveCardHTML(b, o){
+  o = o || {};
+  var out = b.types.filter(function(t){ return t.base !== null && t.left - t.pending <= 0; });
+  var none = b.types.every(function(t){ return t.base === null; });
+  var h = '<div class="card lvcard"><div class="lvhead"><h3>' + esc(o.title || 'رصيد أجازاتي') + ' <bdi class="lvyear">' + b.year + '</bdi></h3><span class="sp"></span>' +
+    (o.more ? '<button class="btn sm" data-go="leave">التفاصيل</button>' : '') + '</div>' +
+    '<div class="lvgrid">' + b.types.map(leaveTileHTML).join('') + '</div><div class="lvfoot">' +
+    '<span class="chip">بدون أجر : ' + b.unpaid + (b.unpaidPending ? ' (+' + b.unpaidPending + ' تحت الاعتماد)' : '') + '</span>' +
+    (b.hasRow && !none ? '<span class="chip">الحساب من <bdi>' + esc(b.start) + '</bdi></span>' : '') + '</div>';
+  if (none) h += '<div class="lvmsg" style="margin-top:10px">' + (o.self ? 'لسه رصيدك مااتسجلش — المسؤول هو اللي بيسجله.' : 'لسه الرصيد مااتسجلش في ورقة «أرصدة الأجازات».') + '</div>';
+  else if (out.length) h += '<div class="lvmsg bad" style="margin-top:10px">⛔ ' + (o.self ? esc(B().leaveOutMsg) : 'الرصيد خلص') + ' <span class="lvwhich">(' + out.map(function(t){ return esc(t.type); }).join('، ') + ')</span></div>';
+  return h + '</div>';
+}
+function leaveDaysHTML(b){
+  if (!b.days || !b.days.length) return emptyHTML('مفيش أيام أجازة متسجلة', 'في سنة ' + b.year + (b.hasRow ? ' من ' + b.start : '') + '.');
+  return '<div class="list lvdaylist">' + b.days.slice().reverse().map(function(d){
+    return '<div class="item lvday"><div class="t"><bdi>' + esc(d.date) + '</bdi> <span class="sub">' + esc(d.day) + '</span><span class="sp"></span>' + leaveChip(d.type) + ' ' + statusChip(d.approval) + '</div>' +
+      (d.notes ? '<div class="m">' + esc(d.notes) + '</div>' : '') + '</div>';
+  }).join('') + '</div>';
+}
+function loadMyLeave(el){
+  if (!el || !canWrite()) return;
+  LEAVE_CACHE[B().me.email] = null; delete LEAVE_CACHE[B().me.email];
+  leaveBalOf(B().me.email).then(function(b){ el.innerHTML = b ? leaveCardHTML(b, { self: true, more: true }) : ''; });
+}
+function openLeaveDetail(email, year){
+  openModal('رصيد الأجازات', loadingHTML());
+  call('leaveBal', { email: email, year: year }).then(function(r){
+    var b = r.list[0]; if (!b){ $('mbody').innerHTML = emptyHTML('مفيش بيانات', ''); return; }
+    $('mbody').innerHTML = '<div class="attwho">' + avatarHTML(b.email, 'sm') + '<div><b>' + esc(b.name) + (b.code ? ' <span class="sub">(<bdi>' + esc(b.code) + '</bdi>)</span>' : '') + '</b><div class="sub" style="margin:0">' + esc(b.title || '') + (b.team ? ' — ' + esc(b.team) : '') + '</div></div></div>' +
+      leaveCardHTML(b, { title: 'الرصيد', self: email === B().me.email }) + '<div class="sec-title"><h2>أيام الأجازة</h2></div>' + leaveDaysHTML(b);
+  }).catch(function(e){ $('mbody').innerHTML = emptyHTML('مش قادر أحمّل الرصيد', e.message); });
+}
+function leaveMini(t){
+  if (t.base === null) return '<span class="lvmini none"><b>—</b><small>' + esc(t.type) + '</small><small class="of">لسه</small></span>';
+  var free = t.left - t.pending, cls = free <= 0 ? ' out' : (free <= 2 ? ' low' : '');
+  return '<span class="lvmini' + cls + '"><b>' + t.left + '</b><small>' + esc(t.type) + '</small><small class="of">من ' + t.base + '</small>' + (t.pending ? '<small class="pend">' + t.pending + ' تحت الاعتماد</small>' : '') + '</span>';
+}
+
+/* ---------- صفحة «الأجازات» ---------- */
+VIEWS.leave = function(){
+  var v = $('view'), p = S.params, own = isOwner(), team = own || isMgr();
+  var y0 = +today().slice(0, 4), year = +(p.year || y0), side = p.side || '', q = p.q || '';
+  v.innerHTML = '<div class="row"><div><h1 class="page">الأجازات</h1><p class="sub">' +
+    (own ? 'أرصدة كل الناس — الإنتاج والجودة' : team ? 'رصيدك وأرصدة فريقك' : 'رصيدك من الأجازات والأيام اللي اتخصمت') + '</p></div><span class="sp"></span>' +
+    (own ? '<button class="btn" id="lvSync" title="يكتب المستهلك والمتبقي في ورقة «أرصدة الأجازات» ويضيف صف لأي حد مالوش">⟳ تحديث الشيت</button>' : '') + '</div>' +
+    '<div class="filters"><div class="f">السنة<select id="lvYear">' + [y0, y0 - 1, y0 + 1].map(function(y){ return '<option' + (y === year ? ' selected' : '') + '>' + y + '</option>'; }).join('') + '</select></div>' +
+    (own ? '<div class="f">القسم<select id="lvSide"><option value="">الكل</option><option value="prod"' + (side === 'prod' ? ' selected' : '') + '>الإنتاج</option><option value="quality"' + (side === 'quality' ? ' selected' : '') + '>الجودة</option></select></div>' : '') +
+    (team ? '<div class="f">بحث<input id="lvQ" type="search" placeholder="اسم أو كود" value="' + esc(q) + '"></div>' : '') +
+    (own ? '<button class="btn" id="lvCsv">تنزيل Excel</button>' : '') + '</div><div id="lvBody">' + loadingHTML() + '</div>';
+  function again(){ go('leave', { year: $('lvYear').value, side: $('lvSide') ? $('lvSide').value : '', q: $('lvQ') ? $('lvQ').value.trim() : '' }); }
+  $('lvYear').onchange = again; if ($('lvSide')) $('lvSide').onchange = again;
+  if ($('lvQ')) $('lvQ').addEventListener('keydown', function(e){ if (e.key === 'Enter') again(); });
+  if ($('lvSync')) $('lvSync').onclick = function(){
+    var b = this; b.disabled = true;
+    call('leaveRefresh', { year: year }).then(function(r){ toast('اتحدث الشيت: ' + r.people + ' شخص' + (r.added ? ' — اتضاف ' + r.added + ' صف جديد' : ''), 'ok'); LEAVE_CACHE = {}; go('leave', S.params); })
+      .catch(function(e){ b.disabled = false; toast(e.message, 'err'); });
+  };
+  if (!team){
+    call('leaveBal', { year: year, email: B().me.email }).then(function(r){
+      var b = r.list[0];
+      $('lvBody').innerHTML = b ? leaveCardHTML(b, { self: true }) + '<div class="sec-title"><h2>الأيام اللي اتخصمت</h2></div>' + leaveDaysHTML(b) : emptyHTML('مفيش رصيد', '');
+      animateCounts($('lvBody'));
+    }).catch(function(e){ $('lvBody').innerHTML = emptyHTML('مش قادر أحمّل الرصيد', e.message); });
+    return;
+  }
+  call('leaveBal', { year: year }).then(function(r){
+    var me = B().me.email, mine = r.list.filter(function(x){ return x.email === me; })[0];
+    var rows = r.list.filter(function(x){
+      if (side && x.side !== side) return false;
+      if (q && (x.name + ' ' + x.code).indexOf(q) < 0) return false;
+      return own || x.email !== me;
+    }).sort(function(a, b){ return a.name.localeCompare(b.name, 'ar'); });
+    var outN = rows.filter(function(x){ return x.types.some(function(t){ return t.base !== null && t.left - t.pending <= 0; }); }).length;
+    var noneN = rows.filter(function(x){ return x.types.every(function(t){ return t.base === null; }); }).length;
+    var h = (!own && mine ? leaveCardHTML(mine, { self: true }) : '') +
+      '<div class="sec-title"><h2>' + (own ? 'الأرصدة' : 'رصيد الفريق') + ' <span class="chip">' + rows.length + '</span></h2></div>' +
+      '<div class="row lvsum">' + (outN ? '<span class="chip c-red">رصيد خلص : ' + outN + '</span>' : '') + (noneN ? '<span class="chip">لسه مااتسجلش : ' + noneN + '</span>' : '') + '</div>';
+    h += rows.length ? '<div class="list lvlist">' + rows.map(function(x){
+      return '<div class="item lvitem" data-lv="' + esc(x.email) + '"><div class="lvwho">' + avatarHTML(x.email, 'sm') + '<div class="lvwt"><div class="lvname"><b>' + esc(x.name) + '</b>' + (x.code ? ' <span class="chip c-blue"><bdi>' + esc(x.code) + '</bdi></span>' : '') +
+        (own ? ' <span class="chip">' + (x.side === 'quality' ? 'الجودة' : 'الإنتاج') + '</span>' : '') + '</div><div class="lvteam">' + esc(x.team || '') + '</div></div></div>' +
+        '<div class="lvminis">' + x.types.map(leaveMini).join('') + '<span class="lvmini unp"><b>' + x.unpaid + '</b><small>بدون أجر</small><small class="of">يوم</small></span></div></div>';
+    }).join('') + '</div>' : emptyHTML('مفيش نتايج', q ? 'جرّب اسم أو كود تاني.' : '');
+    h += '<div class="sub" style="margin-top:14px">الرصيد الأساسي بيتكتب في ورقة «أرصدة الأجازات» في ملف Setting — والمستهلك والمتبقي بيتحسبوا لوحدهم من الحضور.</div>';
+    $('lvBody').innerHTML = h;
+    animateCounts($('lvBody'));
+    Array.prototype.forEach.call(document.querySelectorAll('[data-lv]'), function(el){ el.onclick = function(){ openLeaveDetail(el.dataset.lv, year); }; });
+    if ($('lvCsv')) $('lvCsv').onclick = function(){
+      var hd = ['الكود','الاسم','الفريق','القسم'], data = rows.map(function(x){
+        var a = [x.code, x.name, x.team, x.side === 'quality' ? 'الجودة' : 'الإنتاج'];
+        x.types.forEach(function(t){ a.push(t.base === null ? '' : t.base, t.used, t.pending, t.left === null ? '' : t.left); });
+        a.push(x.unpaid); return a;
+      });
+      r.list[0] && r.list[0].types.forEach(function(t){ hd.push('رصيد ' + t.type, 'مستهلك ' + t.type, 'تحت الاعتماد ' + t.type, 'متبقي ' + t.type); });
+      hd.push('بدون أجر');
+      downloadCSV('أرصدة الأجازات ' + year, hd, data, 'NERIC-Leave_' + year);
+    };
+  }).catch(function(e){ $('lvBody').innerHTML = emptyHTML('مش قادر أحمّل الأرصدة', e.message); });
+};
+function animateCounts(root){
+  if (!root || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  Array.prototype.forEach.call(root.querySelectorAll('[data-count]'), function(el){
+    var end = +el.dataset.count; if (!(end > 0)) return;
+    var t0 = performance.now();
+    (function step(t){ var k = Math.min(1, (t - t0) / 600); el.textContent = Math.round(end * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); })(t0);
+  });
+}
 
 /* ---------- لوحة الخطوط ---------- */
 function boardHTML(board, compact, topHTML, midHTML){
@@ -3370,7 +3659,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611100927').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611101131').catch(function(){}); });
 </script>
 </body>
 </html>
