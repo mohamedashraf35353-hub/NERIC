@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611101222"></script>
+<script src="config.js?v=202611101645"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1065,7 +1065,8 @@ body.ds-C{background:var(--bg)!important}
 .lvtile .pend{color:var(--amber);margin-top:4px}
 .lvbar{height:7px;border-radius:99px;background:var(--gray-l);overflow:hidden;margin:8px 6px 0}
 .lvbar i{display:block;height:100%;background:var(--blue);border-radius:inherit}
-.lvtile.low .n{color:#ff7a00}.lvtile.low .lvbar i{background:#ff7a00}
+.lvtile.ann{border-color:#00d14b}.lvtile.ann .n{color:#00d14b}.lvtile.ann .lvbar i{background:#00d14b}
+.lvtile.cas{border-color:#ff6a00}.lvtile.cas .n{color:#ff6a00}.lvtile.cas .lvbar i{background:#ff6a00}
 .lvtile.out{border-color:#ff1744;box-shadow:0 0 6px 1px rgba(255,23,68,.35),inset 0 0 10px rgba(255,23,68,.08)}
 .lvtile.out .n{color:#ff1744}
 .lvtile.none{border-style:dashed;border-color:var(--line)}
@@ -1084,7 +1085,7 @@ body.ds-C{background:var(--bg)!important}
 .lvmini small{font-size:12px;font-weight:800;color:var(--text)}
 .lvmini small.of{font-weight:600;color:var(--muted);font-size:11.5px}
 .lvmini small.pend{color:var(--amber);font-size:11px}
-.lvmini.low b{color:#ff7a00}
+.lvmini.ann b{color:#00d14b}.lvmini.cas b{color:#ff6a00}
 .lvmini.out{border-color:#ff1744;box-shadow:0 0 5px rgba(255,23,68,.35)}.lvmini.out b{color:#ff1744}
 .lvmini.none b{color:var(--muted)}
 .lvmini.sick{background:#e6f6ff;border-color:#38bdf8}.lvmini.sick b,.lvmini.sick small{color:#0369a1}
@@ -2314,9 +2315,11 @@ function wireAttForm(rec, isNew, ro){
 }
 
 /* ---------- كارت الرصيد ---------- */
+/** لون كل نوع: الاعتيادية أخضر فاقع — العارضة برتقالي فاقع (ولو الرصيد خلص: أحمر) */
+function leaveTone(type){ return type === 'اعتيادية' ? ' ann' : type === 'عارضة' ? ' cas' : ''; }
 function leaveTileHTML(t){
   if (t.base === null) return '<div class="lvtile none"><div class="k">' + esc(t.type) + '</div><div class="n">—</div><div class="of">لسه مااتسجلش</div>' + (t.used ? '<div class="of">اتاخد ' + t.used + '</div>' : '') + '</div>';
-  var free = t.left - t.pending, cls = free <= 0 ? ' out' : (free <= 2 ? ' low' : '');
+  var free = t.left - t.pending, cls = leaveTone(t.type) + (free <= 0 ? ' out' : '');
   var pct = t.base > 0 ? Math.max(0, Math.min(100, t.left / t.base * 100)) : 0;
   return '<div class="lvtile' + cls + '"><div class="k">' + esc(t.type) + '</div><div class="n" data-count="' + t.left + '">' + t.left + '</div>' +
     '<div class="of">متبقي من ' + t.base + '</div><div class="lvbar"><i style="width:' + pct + '%"></i></div>' +
@@ -2364,7 +2367,7 @@ function openLeaveDetail(email, year){
 }
 function leaveMini(t){
   if (t.base === null) return '<span class="lvmini none"><b>—</b><small>' + esc(t.type) + '</small><small class="of">لسه</small></span>';
-  var free = t.left - t.pending, cls = free <= 0 ? ' out' : (free <= 2 ? ' low' : '');
+  var free = t.left - t.pending, cls = leaveTone(t.type) + (free <= 0 ? ' out' : '');
   return '<span class="lvmini' + cls + '"><b>' + t.left + '</b><small>' + esc(t.type) + '</small><small class="of">من ' + t.base + '</small>' + (t.pending ? '<small class="pend">' + t.pending + ' تحت الاعتماد</small>' : '') + '</span>';
 }
 
@@ -3685,7 +3688,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611101222').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611101645').catch(function(){}); });
 </script>
 </body>
 </html>
