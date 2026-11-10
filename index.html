@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611101645"></script>
+<script src="config.js?v=202611101652"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -970,8 +970,22 @@ body.ds-C{background:var(--bg)!important}
 .rchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .rchip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:12.5px;font-weight:800;line-height:1.3;border:1px solid var(--line);max-width:100%}
 .rchip i{font-style:normal;font-size:12px}
-.r-role{color:var(--blue);background:color-mix(in srgb,var(--blue) 9%,var(--card));border-color:color-mix(in srgb,var(--blue) 30%,var(--line))}
-.r-team{color:var(--purple);background:color-mix(in srgb,var(--purple) 9%,var(--card));border-color:color-mix(in srgb,var(--purple) 30%,var(--line))}
+/* الدور بلون «تسجيل عمل» والفريق بلون «بلاغ توقف» */
+:root{--work:#0d9488;--stopc:#e11d48}
+:root[data-theme="dark"]{--work:#2dd4bf;--stopc:#fb7185}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--work:#2dd4bf;--stopc:#fb7185}}
+.r-role{color:var(--work);background:color-mix(in srgb,var(--work) 10%,var(--card));border-color:color-mix(in srgb,var(--work) 35%,var(--line))}
+.r-team{color:var(--stopc);background:color-mix(in srgb,var(--stopc) 9%,var(--card));border-color:color-mix(in srgb,var(--stopc) 30%,var(--line))}
+/* القائمة المفتوحة بلون «تسجيل عمل» */
+.topnav a.on,.side a.on,.drawer a.on{background:color-mix(in srgb,var(--work) 13%,var(--card))!important;color:var(--work)!important}
+.bottom a.on{color:var(--work)!important}
+.topnav a:focus-visible{outline-color:var(--work)}
+/* اسم الفريق فوق بلون «بلاغ توقف» — والدور تحت الاسم بلون «تسجيل عمل» */
+.brand b{--team-grad:linear-gradient(90deg,var(--stopc) 0%,color-mix(in srgb,var(--stopc) 70%,#ff8a3d) 50%,var(--stopc) 100%);
+  animation:lgTeamIn .9s cubic-bezier(.2,.8,.2,1) .2s backwards,hdTeamShine 4.5s ease-in-out 1.1s infinite,hdTeamGlowR 3s ease-in-out infinite}
+@keyframes hdTeamGlowR{0%,100%{filter:drop-shadow(0 0 5px color-mix(in srgb,var(--stopc) 25%,transparent))}50%{filter:drop-shadow(0 0 12px color-mix(in srgb,var(--stopc) 50%,transparent))}}
+@media (prefers-reduced-motion:reduce){ .brand b{animation:none} }
+#tbRole{color:var(--work);font-weight:800}
 .attwho{display:flex;gap:12px;align-items:center;margin:4px 0 14px;padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
 .attwho b{font-size:16px}
 .attwho .rchips{margin-top:6px}
@@ -3688,7 +3702,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611101645').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611101652').catch(function(){}); });
 </script>
 </body>
 </html>
