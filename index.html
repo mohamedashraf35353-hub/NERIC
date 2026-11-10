@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611101652"></script>
+<script src="config.js?v=202611101718"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -778,6 +778,8 @@ body.wide-page main{max-width:none}
 
 /* ---------- صورتي في لوحة المتابعة والهيدر + الرسايل الصوتية ---------- */
 .hello{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hello .hname{font-size:19px;font-weight:900;color:var(--text)}
+.hello .helloav{margin-inline-start:12px}
 .helloav{border:0;background:transparent;padding:0;cursor:pointer;border-radius:50%;display:inline-flex;transition:transform .15s}
 .helloav:hover{transform:scale(1.08)}
 .cav.md{flex:0 0 40px;width:40px;height:40px;font-size:17px;box-shadow:0 0 0 2px var(--card),0 0 0 4px color-mix(in srgb,var(--blue) 45%,transparent)}
@@ -997,10 +999,10 @@ body.ds-C{background:var(--bg)!important}
 .citem.online .cav,.cpane-h.online .cav{animation:neonRing 3s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){ .onl::before,.citem.online .cav,.cpane-h.online .cav{animation:none} }
 /* ---------- الهيدر: الصورة والاسم أكبر وأوضح + زرار الخروج ---------- */
-.whoav{margin-inline-end:12px}
+.whoav{margin-inline-end:22px}
 .whoav .cav.sm{flex:0 0 50px;width:50px;height:50px;font-size:20px}
 .who{font-size:14px;line-height:1.35;display:flex;flex-direction:column;align-items:flex-start;text-align:right}
-.who b{font-size:16.5px;font-weight:800}
+.who b{font-size:19px;font-weight:900;color:var(--text)}
 .tb-out{margin-top:8px;border:1px solid color-mix(in srgb,var(--red) 35%,var(--line));background:color-mix(in srgb,var(--red) 7%,var(--card));color:var(--red);
   font:inherit;font-size:12.5px;font-weight:800;padding:4px 11px;border-radius:99px;cursor:pointer;transition:background-color .15s,box-shadow .15s}
 .tb-out:hover{background:color-mix(in srgb,var(--red) 14%,var(--card));box-shadow:0 0 12px -4px color-mix(in srgb,var(--red) 70%,transparent)}
@@ -1919,7 +1921,7 @@ function applyDashStyle(st){
 function stylePickerHTML(){ return ''; }   // اختيار الشكل اتشال — المظهر ثابت C
 VIEWS.dashboard = function(){
   var v = $('view');
-  v.innerHTML = '<div class="dhero"><div class="dhead"><div><h1 class="page">لوحة المتابعة</h1><p class="sub hello" style="margin:0">أهلًا ' + esc(B().me.name) + (B().me.code ? ' (' + esc(B().me.code) + ')' : '') + ' <button type="button" class="helloav" data-act="avatar" title="صورتي الشخصية" aria-label="صورتي الشخصية">' + avatarHTML(B().me.email, 'md') + '</button></p>' + roleChips(B().me) + '</div><span class="sp"></span>' + stylePickerHTML() + '</div>' +
+  v.innerHTML = '<div class="dhero"><div class="dhead"><div><h1 class="page">لوحة المتابعة</h1><p class="sub hello" style="margin:0">أهلًا <b class="hname">' + esc(B().me.name) + '</b>' + (B().me.code ? ' (' + esc(B().me.code) + ')' : '') + ' <button type="button" class="helloav" data-act="avatar" title="صورتي الشخصية" aria-label="صورتي الشخصية">' + avatarHTML(B().me.email, 'md') + '</button></p>' + roleChips(B().me) + '</div><span class="sp"></span>' + stylePickerHTML() + '</div>' +
     quickHTML() + '<div id="myatt"></div><div id="myleave"></div></div><div id="dash">' + loadingHTML() + '</div>';
   wireQuick();
   Array.prototype.forEach.call(document.querySelectorAll('[data-style]'), function(b){
@@ -3702,7 +3704,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611101652').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611101718').catch(function(){}); });
 </script>
 </body>
 </html>
