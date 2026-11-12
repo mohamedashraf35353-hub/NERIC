@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611101718"></script>
+<script src="config.js?v=202611121203"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1115,6 +1115,35 @@ body.ds-C{background:var(--bg)!important}
 :root[data-theme="dark"] .lvtile.out{box-shadow:0 0 8px 1px rgba(255,45,85,.6),inset 0 0 12px rgba(255,45,85,.15)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .lvtile.out{box-shadow:0 0 8px 1px rgba(255,45,85,.6),inset 0 0 12px rgba(255,45,85,.15)}}
 @media (prefers-reduced-motion: reduce){.lvbox,.lvtile{animation:none}}
+
+/* ---------- الصور + الفنيين ---------- */
+.filters .f{min-width:0;max-width:100%}.filters .f select,.filters .f input{max-width:100%}
+.share-line{margin-top:8px;font-size:13.5px;font-weight:700;color:var(--work)}
+.multi label.me{border-color:var(--work);background:color-mix(in srgb,var(--work) 12%,var(--card));color:var(--work);opacity:1;cursor:default}
+.pfield{border:1.5px dashed color-mix(in srgb,var(--blue) 40%,var(--line));border-radius:14px;padding:12px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:10px}
+.pgrid:empty{display:none}
+.pth{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;border:1.5px solid var(--line);background:var(--gray-l);cursor:zoom-in;animation:lvIn .25s ease backwards}
+.pth img{width:100%;height:100%;object-fit:cover;display:block}
+.pth.busy img{opacity:.55}
+.pth.err{border-color:var(--red)}
+.pbusy{position:absolute;inset:auto 0 0 0;background:rgba(15,23,42,.72);color:#fff;font-size:11.5px;font-weight:800;text-align:center;padding:3px 0}
+.pload{position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%) var(--gray-l);background-size:200% 100%;animation:pshine 1.2s linear infinite}
+@keyframes pshine{from{background-position:120% 0}to{background-position:-80% 0}}
+.pdel{position:absolute;top:5px;inset-inline-start:5px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(15,23,42,.75);color:#fff;font-size:14px;cursor:pointer;display:grid;place-items:center}
+.pbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.pgrid:empty+.pbtns{margin-top:0}
+.pbtn{min-height:44px;font-weight:800}
+.pbtn.off{opacity:.45;pointer-events:none}
+.pcount{font-size:12.5px;color:var(--muted);font-weight:700}
+.pchip{font-weight:700}
+.plb{position:fixed;inset:0;z-index:9999;background:rgba(2,6,23,.92);display:flex;align-items:center;justify-content:center;animation:lvIn .2s ease backwards}
+.plb img{max-width:94vw;max-height:86vh;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.lb-x{position:absolute;top:14px;inset-inline-end:14px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:20px;cursor:pointer}
+.lb-n{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:64px;border:0;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;font-size:34px;cursor:pointer}
+.lb-prev{right:10px}.lb-next{left:10px}
+.lb-c{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);color:#fff;font-weight:800;background:rgba(255,255,255,.14);padding:4px 12px;border-radius:99px}
+@media (prefers-reduced-motion:reduce){.pth,.plb{animation:none}.pload{animation:none}}
 </style>
 </head>
 <body>
@@ -1554,6 +1583,17 @@ function stationOptions(onlyElectrical, forWrite){
   return (B().stations || []).filter(function(s){ return (!onlyElectrical || s.electrical !== 'لا') && (!forWrite || !isHW(s.code) || canHarness()); })
     .map(function(s){ return { v: s.code, t: s.code + ' — ' + (s.nameAr || s.name) + (s.line === hwLine() ? ' (الجودة)' : ' (خط ' + s.line + ')') }; });
 }
+/** الفنيين اللي اشتغلوا: الفني بيختار من فريقه (والفريق الشامل: القسم كله) — المشرف من قسمه — والمسؤول الكل */
+var UMBRELLA = { 'فريق الكهرباء': 'prod', 'فريق الجودة': 'quality' };
+function techPickOptions(){
+  var me = B().me, myTeam = String(me.team || '').trim(), wide = UMBRELLA[myTeam];
+  return peopleOptions(function(p){
+    if (p.role === 'مشاهد') return false;
+    if (me.role === 'فني') return p.email === me.email || (!myTeam ? p.side === B().side : wide ? p.side === wide : String(p.team || '').trim() === myTeam);
+    if (!isOwner() && B().side && p.side && p.side !== B().side) return false;
+    return p.role === 'فني' || p.role === 'مشرف';
+  });
+}
 function peopleOptions(filter){ return (B().people || []).filter(filter || function(){ return true; }).map(function(p){ return { v: p.name, t: p.name + (p.code ? ' (' + p.code + ')' : '') }; }); }
 function techOptionsByEmail(){ var qm = !isOwner() && isQM(); return (B().people || []).filter(function(p){ return qm ? (p.isQ || p.email === B().me.email) : (p.role === 'فني' || p.role === 'مشرف'); }).map(function(p){ return { v: p.email, t: p.name + (p.code ? ' (' + p.code + ')' : '') + (p.team ? ' — ' + p.team : '') }; }); }
 /* ---------- اسم العربة: C16 - MCI - U4 (رقم العربة شمال، النوع في النص، الوحدة يمين) ---------- */
@@ -1585,11 +1625,13 @@ function FORMS(){
       { k:'unit', t:'رقم الوحدة', type:'hidden' },
       { k:'train', t:'رقم القطار', type:'hidden' },
       { k:'step', t:'خطوة العمل', type:'text', req:1, list: 'stepsList', full:1, hint:'اختار من القائمة أو اكتب الخطوة' },
-      { k:'techs', t:'الفنيون', type:'multi', options: peopleOptions(function(p){ return p.role === 'فني' || p.role === 'مشرف'; }), full:1,
+      { k:'techs', t:'الفنيين اللي اشتغلوا في الشغلانة', type:'multi', options: techPickOptions(), full:1, share:1,
+        hint: B().me.role === 'فني' ? 'اختار اللي اشتغلوا معاك من فريقك — والتقييم بيتقسم عليكم بالتساوي' : 'التقييم بيتقسم بالتساوي على اللي اشتغلوا',
         def: function(){ return B().me.role === 'فني' ? B().me.name : ''; } },
       { k:'status', t:'الحالة', type:'select', req:1, options: opts(st.prod), def:'جاري' },
       { k:'supervisor', t:'المشرف', type:'select', options: peopleOptions(function(p){ return p.role === 'مشرف' || p.role === 'مدير'; }) },
-      { k:'notes', t:'الملاحظات', type:'textarea', full:1 }
+      { k:'notes', t:'الملاحظات', type:'textarea', full:1 },
+      { k:'photos', t:'صور الشغل', type:'photos', kind:'prod', full:1 }
     ]},
     stop: { title: 'توقف', fields: [
       { k:'station', t:'المحطة', type:'select', options: stationOptions(false, true), full:1 },
@@ -1602,7 +1644,8 @@ function FORMS(){
       { k:'owner', t:'المسؤول عن المتابعة', type:'select', options: peopleOptions() },
       { k:'status', t:'الحالة', type:'select', req:1, options: opts(st.stop), def:'مفتوح' },
       { k:'desc', t:'الوصف', type:'textarea', full:1 },
-      { k:'action', t:'الإجراء المتخذ', type:'textarea', full:1, hint:'لازم يتكتب قبل قفل التوقف' }
+      { k:'action', t:'الإجراء المتخذ', type:'textarea', full:1, hint:'لازم يتكتب قبل قفل التوقف' },
+      { k:'photos', t:'صور الحاجة المتوقفة', type:'photos', kind:'stop', full:1 }
     ]},
     issue: { title: 'مشكلة', fields: [
       { k:'title', t:'العنوان', type:'text', req:1, full:1 },
@@ -1615,7 +1658,8 @@ function FORMS(){
       { k:'date', t:'تاريخ الاكتشاف', type:'date', def: today },
       { k:'due', t:'الموعد المستهدف', type:'date' },
       { k:'status', t:'الحالة', type:'select', req:1, options: opts(st.issue), def:'جديدة' },
-      { k:'action', t:'الإجراء / الحل', type:'textarea', full:1, hint:'لازم يتكتب قبل قفل المشكلة' }
+      { k:'action', t:'الإجراء / الحل', type:'textarea', full:1, hint:'لازم يتكتب قبل قفل المشكلة' },
+      { k:'photos', t:'صور الحاجة اللي فيها المشكلة', type:'photos', kind:'issue', full:1 }
     ]},
     att: { title: 'حضور فني', fields: [
       { k:'date', t:'التاريخ', type:'date', req:1, def: today },
@@ -1665,14 +1709,18 @@ function fieldHTML(f, val, ro){
       options.map(function(o){ return '<option value="'+esc(o.v)+'"'+(o.v === val ? ' selected' : '')+'>'+esc(o.t)+'</option>'; }).join('') + '</select>';
   } else if (f.type === 'textarea'){
     h += '<textarea id="'+id+'"'+dis+'>'+esc(val)+'</textarea>';
+  } else if (f.type === 'photos'){
+    h += photosFieldHTML(id, f, val, ro);
   } else if (f.type === 'multi'){
     var sel = String(val || '').split(/[،,]/).map(function(x){ return x.trim(); }).filter(Boolean);
     var options2 = (f.options || []).slice();
     sel.forEach(function(s){ if (!options2.some(function(o){ return o.v === s; })) options2.push({ v: s, t: s }); });
+    var meLock = f.share && B().me.role === 'فني' ? B().me.name : '';
     h += '<div class="multi" id="'+id+'">' + (options2.length ? options2.map(function(o){
-      var on = sel.indexOf(o.v) >= 0;
-      return '<label class="'+(on?'on':'')+'"><input type="checkbox" value="'+esc(o.v)+'"'+(on?' checked':'')+dis+'>'+esc(o.t)+'</label>';
-    }).join('') : '<span class="hint">مفيش فنيين مسجلين في صلاحيات الدخول.</span>') + '</div>';
+      var on = sel.indexOf(o.v) >= 0 || (meLock && o.v === meLock);
+      return '<label class="'+(on?'on':'')+(o.v === meLock ? ' me' : '')+'"><input type="checkbox" value="'+esc(o.v)+'"'+(on?' checked':'')+(o.v === meLock ? ' disabled' : dis)+'>'+esc(o.t)+(o.v === meLock ? ' (انت)' : '')+'</label>';
+    }).join('') : '<span class="hint">مفيش فنيين مسجلين في صلاحيات الدخول.</span>') + '</div>' +
+      (f.share ? '<div class="share-line" id="'+id+'_share"></div>' : '');
   } else {
     var type = f.type || 'text';
     var v = type === 'datetime-local' ? toInputDT(val) : val;
@@ -1688,6 +1736,7 @@ function readField(f){
   if (f.type === 'multi'){
     return Array.prototype.map.call(el.querySelectorAll('input:checked'), function(i){ return i.value; }).join('، ');
   }
+  if (f.type === 'photos') return el.dataset.ids || '';
   var v = el.value;
   if (f.type === 'datetime-local') v = v ? v.replace('T', ' ') : '';
   return v;
@@ -1719,6 +1768,95 @@ function continueWork(base){
 }
 function isPastProd(r){ return r && r.id && r.date && r.date < today(); }
 
+/* =============================================================
+ *  الصور: شغل / توقف / مشكلة — بتتصغّر على الموبايل وبتترفع أول ما تتختار
+ * =========================================================== */
+var PHOTO_MAX = 8, PHOTO_BUSY = 0, PHOTO_CACHE = {};
+function photoIdsOf(v){
+  var out = [];
+  String(v || '').split(/[\s,،]+/).forEach(function(x){
+    var m = x.match(/\/d\/([A-Za-z0-9_-]{20,})/) || x.match(/^([A-Za-z0-9_-]{20,})$/);
+    if (m && out.indexOf(m[1]) < 0) out.push(m[1]);
+  });
+  return out;
+}
+function photoChip(v){ var n = photoIdsOf(v).length; return n ? '<span class="pchip">📷 ' + n + '</span>' : ''; }
+/** نصيب كل فني تحت الاختيار */
+function paintShare(){
+  var box = $('f_techs'), line = $('f_techs_share'); if (!box || !line) return;
+  var n = box.querySelectorAll('input:checked').length;
+  line.innerHTML = n ? '👷 <b>' + n + '</b> ' + (n === 1 ? 'فني' : 'فنيين') + ' — نصيب كل واحد في التقييم: <b>' + (Math.round(1000 / n) / 10) + '%</b>' : 'اختار اللي اشتغلوا في الشغلانة';
+}
+function photosFieldHTML(id, f, val, ro){
+  var ids = photoIdsOf(val);
+  var h = '<div class="pfield" id="' + id + '" data-ids="' + esc(ids.join('\n')) + '" data-kind="' + esc(f.kind || 'prod') + '"><div class="pgrid"></div>';
+  if (!ro) h += '<div class="pbtns"><label class="btn pbtn"><input type="file" accept="image/*" capture="environment" hidden>📷 صوّر دلوقتي</label>' +
+    '<label class="btn pbtn"><input type="file" accept="image/*" multiple hidden>🖼️ من الصور</label><span class="pcount"></span></div>';
+  else if (!ids.length) h += '<div class="hint">مفيش صور.</div>';
+  return h + '</div>';
+}
+function wirePhotos(id, f, ro){
+  var box = $(id); if (!box) return;
+  var grid = box.querySelector('.pgrid'), items = photoIdsOf(box.dataset.ids).map(function(x){ return { id: x }; });
+  function sync(){ box.dataset.ids = items.filter(function(x){ return x.id; }).map(function(x){ return x.id; }).join('\n'); }
+  function paint(){
+    grid.innerHTML = items.map(function(x, i){
+      var src = x.local || PHOTO_CACHE[x.id] || '';
+      return '<div class="pth' + (x.busy ? ' busy' : '') + (x.err ? ' err' : '') + '" data-i="' + i + '">' +
+        (src ? '<img src="' + src + '" alt="صورة ' + (i + 1) + '">' : '<span class="pload" aria-hidden="true"></span>') +
+        (x.busy ? '<span class="pbusy">بيترفع...</span>' : '') + (x.err ? '<span class="pbusy">ماترفعتش</span>' : '') +
+        (!ro ? '<button type="button" class="pdel" data-del="' + i + '" aria-label="شيل الصورة">✕</button>' : '') + '</div>';
+    }).join('');
+    var cnt = box.querySelector('.pcount'); if (cnt) cnt.textContent = items.length ? items.length + ' من ' + PHOTO_MAX : 'لحد ' + PHOTO_MAX + ' صور';
+    Array.prototype.forEach.call(box.querySelectorAll('.pbtn input'), function(inp){ inp.disabled = items.length >= PHOTO_MAX; inp.parentNode.classList.toggle('off', items.length >= PHOTO_MAX); });
+    Array.prototype.forEach.call(grid.querySelectorAll('[data-del]'), function(b){ b.onclick = function(e){ e.stopPropagation(); items.splice(+b.dataset.del, 1); sync(); paint(); }; });
+    Array.prototype.forEach.call(grid.querySelectorAll('.pth'), function(t){ t.onclick = function(){
+      var list = items.map(function(x){ return x.local || PHOTO_CACHE[x.id] || ''; }).filter(Boolean);
+      var me = items[+t.dataset.i], src = me.local || PHOTO_CACHE[me.id];
+      if (src) openLightbox(list, list.indexOf(src));
+    }; });
+  }
+  // الصور القديمة: نجيبها من السيرفر
+  var need = items.filter(function(x){ return !PHOTO_CACHE[x.id]; }).map(function(x){ return x.id; });
+  if (need.length) call('photos', { ids: need }).then(function(r){ for (var k in r.photos) if (r.photos[k]) PHOTO_CACHE[k] = r.photos[k]; paint(); }).catch(function(){});
+  paint();
+  if (ro) return;
+  Array.prototype.forEach.call(box.querySelectorAll('.pbtn input'), function(inp){
+    inp.onchange = function(){
+      var files = Array.prototype.slice.call(inp.files || []).slice(0, PHOTO_MAX - items.length); inp.value = '';
+      files.forEach(function(file){
+        var it = { id: '', busy: true }; items.push(it); PHOTO_BUSY++; paint();
+        shrinkImage(file, 1600, false, .82).then(function(data){
+          it.local = data; paint();
+          return call('photoUp', { kind: f.kind || 'prod', data: data });
+        }).then(function(r){ it.id = r.id; it.busy = false; PHOTO_CACHE[r.id] = it.local; })
+          .catch(function(e){ it.busy = false; it.err = true; toast(e.message, 'err'); })
+          .then(function(){ PHOTO_BUSY = Math.max(0, PHOTO_BUSY - 1); if (it.err) items.splice(items.indexOf(it), 1); sync(); paint(); });
+      });
+    };
+  });
+}
+/** عرض الصورة كبيرة (وتقليب بينهم) */
+function openLightbox(list, i){
+  if (!list.length) return;
+  i = Math.max(0, i || 0);
+  var el = document.createElement('div'); el.className = 'plb'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'الصور');
+  document.body.appendChild(el);
+  function close(){ document.removeEventListener('keydown', key); el.remove(); }
+  function show(){
+    el.innerHTML = '<img src="' + list[i] + '" alt="صورة ' + (i + 1) + '"><button class="lb-x" aria-label="إغلاق">✕</button>' +
+      (list.length > 1 ? '<button class="lb-n lb-prev" aria-label="اللي قبلها">›</button><button class="lb-n lb-next" aria-label="اللي بعدها">‹</button><div class="lb-c" dir="ltr">' + (i + 1) + ' / ' + list.length + '</div>' : '');
+    el.querySelector('.lb-x').onclick = close;
+    if (list.length > 1){ el.querySelector('.lb-prev').onclick = function(e){ e.stopPropagation(); i = (i - 1 + list.length) % list.length; show(); };
+      el.querySelector('.lb-next').onclick = function(e){ e.stopPropagation(); i = (i + 1) % list.length; show(); }; }
+  }
+  function key(e){ if (e.key === 'Escape') close(); else if (e.key === 'ArrowLeft' && list.length > 1){ i = (i + 1) % list.length; show(); } else if (e.key === 'ArrowRight' && list.length > 1){ i = (i - 1 + list.length) % list.length; show(); } }
+  el.addEventListener('click', function(e){ if (e.target === el) close(); });
+  var x0 = null; el.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, { passive: true });
+  el.addEventListener('touchend', function(e){ if (x0 === null || list.length < 2) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50){ i = dx < 0 ? (i - 1 + list.length) % list.length : (i + 1) % list.length; show(); } });
+  document.addEventListener('keydown', key);
+  show();
+}
 function openForm(entity, rec, onSaved, opts){
   var F = FORMS()[entity];
   rec = rec || {};
@@ -1762,8 +1900,10 @@ function openForm(entity, rec, onSaved, opts){
   if ($('fcont')) $('fcont').onclick = function(){ continueWork(rec); };
   // تفاعل الحقول المتعدد
   Array.prototype.forEach.call(document.querySelectorAll('.multi input'), function(i){
-    i.onchange = function(){ i.parentNode.classList.toggle('on', i.checked); };
+    i.onchange = function(){ i.parentNode.classList.toggle('on', i.checked); paintShare(); };
   });
+  paintShare();
+  F.fields.forEach(function(f){ if (f.type === 'photos') wirePhotos('f_' + f.k, f, ro); });
   if (entity === 'prod' || entity === 'stop' || entity === 'issue') { wireSlotField(entity); if (!ro && isNew) wireStationCar(); }
   if (entity === 'prod') wireProdForm();
   if (entity === 'stop' && !ro) wireStopForm();
@@ -1790,6 +1930,7 @@ function submitForm(entity, F, rec, onSaved, confirmed){
     if (FORM_OPTS.continueFrom) data.continueFrom = FORM_OPTS.continueFrom;
     if (FORM_OPTS.correct) data.correct = true;
   }
+  if (PHOTO_BUSY > 0){ formMsg('استنى لحظة — الصور لسه بترفع.', 'warn'); return; }
   var missing = [];
   F.fields.forEach(function(f){ data[f.k] = readField(f); if (f.req && !String(data[f.k]).trim()) missing.push(f.t); });
   if (missing.length){ formMsg('لازم تكمل: ' + missing.join('، ')); return; }
@@ -2042,7 +2183,7 @@ function prodItem(r){
     (r.prevId ? ' <span class="chip c-purple">متابعة</span>' : '') + (r.isLatest === 0 ? ' <span class="chip">اتكمّل بعدين</span>' : '') + '</div>' +
     '<div class="m"><span>📍 ' + esc(stationLabel(r.station)) + (r.slot ? ' — ' + esc(slotLabel(r.slot)) : '') + '</span>' + (r.car ? '<span>🚇 ' + carTag(r) + '</span>' : '') +
     '<span>📅 ' + (r.day ? esc(r.day) + ' ' : '') + esc(r.date) + (r.shift ? ' — ' + esc(r.shift) : '') + '</span>' + (times ? '<span>' + times + '</span>' : '') +
-    (r.techs ? '<span>👷 ' + esc(withCodes(r.techs, r.techCodes)) + '</span>' : '') +
+    (r.techs ? '<span>👷 ' + esc(withCodes(r.techs, r.techCodes)) + '</span>' : '') + photoChip(r.photos) +
     '</div>' +
     (showCont ? '<div class="acts"><button class="btn sm primary" data-cont="'+esc(r.id)+'">متابعة الشغل النهارده</button></div>' : '') + '</div>';
 }
@@ -2052,7 +2193,7 @@ function stopItem(r){
   var dur = r.end ? fmtMin(r.minutes) : 'مستمر';
   return '<div class="item" data-item="'+esc(r.id)+'"><div class="t">' + esc(r.reason || 'توقف') + ' ' + statusChip(r.status) + ' <span class="chip">' + esc(dur) + '</span></div>' +
     '<div class="m">' + (r.station ? '<span>📍 ' + esc(stationLabel(r.station)) + (r.slot ? ' — ' + esc(slotLabel(r.slot)) : '') + '</span>' : '') + (r.car ? '<span>🚇 ' + esc(r.car) + '</span>' : '') +
-    '<span>⏱ ' + esc(r.start) + (r.end ? ' ← ' + esc(r.end) : '') + '</span>' + (r.owner ? '<span>👤 ' + esc(withCodes(r.owner, r.ownerCode)) + '</span>' : '') + '</div>' +
+    '<span>⏱ ' + esc(r.start) + (r.end ? ' ← ' + esc(r.end) : '') + '</span>' + (r.owner ? '<span>👤 ' + esc(withCodes(r.owner, r.ownerCode)) + '</span>' : '') + photoChip(r.photos) + '</div>' +
     (r.desc ? '<div class="m">' + esc(r.desc) + '</div>' : '') +
     (open && canEditRec('stop', r) ? '<div class="acts"><button class="btn sm" data-endstop="'+esc(r.id)+'">إنهاء التوقف</button></div>' : '') + '</div>';
 }
@@ -2061,7 +2202,7 @@ function issueItem(r){
   var overdue = r.due && r.due < today() && r.status !== 'محلولة' && r.status !== 'مغلقة';
   return '<div class="item" data-item="'+esc(r.id)+'"><div class="t">' + esc(r.title) + ' ' + statusChip(r.priority) + ' ' + statusChip(r.status) + (overdue ? ' <span class="chip c-red">متأخرة</span>' : '') + '</div>' +
     '<div class="m">' + (r.station ? '<span>📍 ' + esc(stationLabel(r.station)) + (r.slot ? ' — ' + esc(slotLabel(r.slot)) : '') + '</span>' : '') + (r.car ? '<span>🚇 ' + esc(r.car) + '</span>' : '') +
-    '<span>📅 ' + esc(r.date) + (r.due ? ' — الموعد: ' + esc(r.due) : '') + '</span>' + (r.owner ? '<span>👤 ' + esc(withCodes(r.owner, r.ownerCode)) + '</span>' : '') + (r.reporter ? '<span>📣 ' + esc(withCodes(r.reporter, r.reporterCode)) + '</span>' : '') + '</div></div>';
+    '<span>📅 ' + esc(r.date) + (r.due ? ' — الموعد: ' + esc(r.due) : '') + '</span>' + (r.owner ? '<span>👤 ' + esc(withCodes(r.owner, r.ownerCode)) + '</span>' : '') + (r.reporter ? '<span>📣 ' + esc(withCodes(r.reporter, r.reporterCode)) + '</span>' : '') + photoChip(r.photos) + '</div></div>';
 }
 /** دقايق ← «3 س» / «1 س 30 د» / «45 د» */
 function fmtOt(m){ m = Math.round(Number(m) || 0); var h = Math.floor(m / 60), d = m % 60; return (h ? h + ' س' : '') + (h && d ? ' ' : '') + (d || !h ? d + ' د' : ''); }
@@ -3704,7 +3845,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611101718').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611121203').catch(function(){}); });
 </script>
 </body>
 </html>
