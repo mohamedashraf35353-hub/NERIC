@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611121203"></script>
+<script src="config.js?v=202611121554"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1144,6 +1144,33 @@ body.ds-C{background:var(--bg)!important}
 .lb-prev{right:10px}.lb-next{left:10px}
 .lb-c{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);color:#fff;font-weight:800;background:rgba(255,255,255,.14);padding:4px 12px;border-radius:99px}
 @media (prefers-reduced-motion:reduce){.pth,.plb{animation:none}.pload{animation:none}}
+
+/* ---------- تعديلات 12 نوفمبر: الهيدر والعناوين ---------- */
+/* سطر المشروع تحت اسم الفريق: بلون «مشرف إنتاج» وخط أكبر وموشن هادي جدًا */
+.brand span{color:var(--work);font-size:16.5px;font-weight:800;margin-top:16px;animation:projBreath 6s ease-in-out infinite}
+@keyframes projBreath{0%,100%{opacity:.82;text-shadow:none}50%{opacity:1;text-shadow:0 0 10px color-mix(in srgb,var(--work) 35%,transparent)}}
+@media (max-width:860px){ .brand span{font-size:14px;margin-top:10px} }
+/* لوجو الأجازات بيتمايل بهدوء */
+[data-go="leave"] .ic{display:inline-block;transform-origin:50% 85%;animation:beachSway 3.4s ease-in-out infinite}
+@keyframes beachSway{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(7deg) translateY(-2px)}}
+/* عناوين الكروت بولد */
+.kpi .lbl{font-weight:800;font-size:14px;color:var(--text)}
+.ds-A .kpi .lbl{color:#dbe5ff}
+/* سنة الرصيد أكبر وبعيدة عن العنوان */
+.lvyear{display:inline-block;margin-inline-start:14px;font-size:19px;font-weight:800}
+/* الصورة الشخصية والزراير ضعف الحجم (والهيدر بيكبر معاهم) */
+.whoav .cav.sm{flex:0 0 100px;width:100px;height:100px;font-size:40px}
+#themeBtn,#refreshBtn{width:76px;height:76px;font-size:32px;border-radius:18px}
+@media (max-width:860px){
+  /* الموبايل: اسم الفريق في سطر لوحده — وتحته الصورة والزراير */
+  .brand{flex:1 1 calc(100% - 64px);order:1}
+  #menuBtn{order:0}
+  .whoav{order:5;margin-inline-end:auto}
+  #themeBtn{order:6} #refreshBtn{order:7}
+  .whoav .cav.sm{flex:0 0 72px;width:72px;height:72px;font-size:29px}
+  #themeBtn,#refreshBtn{width:58px;height:58px;font-size:25px;border-radius:15px}
+}
+@media (prefers-reduced-motion:reduce){ .brand span,[data-go="leave"] .ic{animation:none} }
 </style>
 </head>
 <body>
@@ -1327,7 +1354,7 @@ function startApp(){
     $('tbTeam').textContent = b.settings.TEAM_NAME || 'NERIC';
     $('tbProject').textContent = 'NERIC - ' + (b.settings.PROJECT_NAME || '');
     $('tbName').textContent = b.me.name; $('tbRole').textContent = b.me.title || b.me.role;
-    buildNav(); loadAvatars();
+    buildNav(); loadAvatars(); initBackGuard();
     var h = (location.hash || '').replace('#','');
     var qc = null; try { qc = new URLSearchParams(location.search).get('chat'); } catch(e){}
     if (qc !== null){   // جاي من دوسة على إشعار رسالة ← افتح المحادثة على طول
@@ -1429,10 +1456,31 @@ function openDrawer(){ $('drawerWrap').classList.remove('hidden'); }
 function closeDrawer(){ $('drawerWrap').classList.add('hidden'); }
 $('refreshBtn').onclick = function(){ refreshBoot().then(function(){ go(S.view, S.params); toast('تم التحديث'); }).catch(function(e){ toast(e.message,'err'); }); };
 
-function go(view, params){
+/* ---------- زرار الرجوع في الموبايل: يرجع للصفحة اللي قبلها أو للرئيسية — مايخرجش من التطبيق ---------- */
+var NAV_STACK = [], BACK_READY = false;
+function initBackGuard(){
+  if (BACK_READY) return; BACK_READY = true;
+  try { history.replaceState({ neric: 'base' }, '', location.href); history.pushState({ neric: 'top' }, '', location.href); } catch(e){ return; }
+  window.addEventListener('popstate', function(){
+    try { history.pushState({ neric: 'top' }, '', location.href); } catch(e){}
+    if ($('app').classList.contains('hidden')) return;
+    var lb = document.querySelector('.plb'); if (lb){ if (window.__plbClose) window.__plbClose(); else lb.remove(); return; }
+    if ($('modalRoot').innerHTML){ closeModal(); return; }
+    if (!$('drawerWrap').classList.contains('hidden')){ closeDrawer(); return; }
+    var prev = NAV_STACK.pop();
+    if (prev){ go(prev.view, prev.params, true); return; }
+    if (S.view !== 'dashboard'){ go('dashboard', {}, true); return; }
+    toast('انت في الصفحة الرئيسية');
+  });
+}
+function go(view, params, fromBack){
+  if (!fromBack && S.view && (S.view !== view || JSON.stringify(S.params || {}) !== JSON.stringify(params || {}))){
+    NAV_STACK.push({ view: S.view, params: S.params || {} }); if (NAV_STACK.length > 30) NAV_STACK.shift();
+  }
+  if (view === 'dashboard' && !fromBack) NAV_STACK = [];
   S.view = view; S.params = params || {};
   document.body.classList.toggle('wide-page', view === 'settings');   // الإعدادات بعرض الشاشة كله علشان الجداول
-  try { history.replaceState(null, '', '#' + view); } catch(e){}
+  try { history.replaceState(history.state, '', '#' + view); } catch(e){}
   document.querySelectorAll('[data-go]').forEach(function(a){ a.classList.toggle('on', a.dataset.go === view); });
   window.scrollTo(0,0);
   var fn = VIEWS[view] || VIEWS.dashboard;
@@ -1842,7 +1890,8 @@ function openLightbox(list, i){
   i = Math.max(0, i || 0);
   var el = document.createElement('div'); el.className = 'plb'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'الصور');
   document.body.appendChild(el);
-  function close(){ document.removeEventListener('keydown', key); el.remove(); }
+  function close(){ document.removeEventListener('keydown', key); el.remove(); window.__plbClose = null; }
+  window.__plbClose = close;
   function show(){
     el.innerHTML = '<img src="' + list[i] + '" alt="صورة ' + (i + 1) + '"><button class="lb-x" aria-label="إغلاق">✕</button>' +
       (list.length > 1 ? '<button class="lb-n lb-prev" aria-label="اللي قبلها">›</button><button class="lb-n lb-next" aria-label="اللي بعدها">‹</button><div class="lb-c" dir="ltr">' + (i + 1) + ' / ' + list.length + '</div>' : '');
@@ -3845,7 +3894,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611121203').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611121554').catch(function(){}); });
 </script>
 </body>
 </html>
