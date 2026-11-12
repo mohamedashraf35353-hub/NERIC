@@ -1,5 +1,5 @@
-// NERIC — Service Worker (نسخة 202611122221)
-const CACHE = 'neric-202611122221';
+// NERIC — Service Worker (نسخة 202611122320)
+const CACHE = 'neric-202611122320';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'badge-96.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
@@ -24,7 +24,7 @@ self.addEventListener('push', e => {
   e.waitUntil((async () => {
     const tag = d.conv ? 'chat-' + d.conv : 'neric-' + (d.id || Date.now());
     const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    wins.forEach(w => w.postMessage({ type: 'push', conv: d.conv || '', id: d.id || '', title: d.title || '', line: d.line || d.body || '' }));
+    wins.forEach(w => w.postMessage({ type: 'push', conv: d.conv || '', view: d.view || '', id: d.id || '', title: d.title || '', line: d.line || d.body || '' }));
     // التطبيق مفتوح قدامك: الدردشة بتتحدث لوحدها (الآيفون لازم يظهر إشعار في كل الأحوال)
     if (!IOS && wins.some(w => w.visibilityState === 'visible' && w.focused)) return;
     let lines = [];
@@ -33,16 +33,16 @@ self.addEventListener('push', e => {
     await self.registration.showNotification(d.title || 'NERIC', {
       body: lines.length > 1 ? lines.join('\n') : (d.body || ''), tag, renotify: true,
       icon: 'icon-192.png', badge: 'badge-96.png', dir: 'rtl', lang: 'ar', vibrate: [90, 50, 90], timestamp: Date.now(),
-      data: { conv: d.conv || '', lines }
+      data: { conv: d.conv || '', view: d.view || '', lines }
     });
   })());
 });
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  const conv = (e.notification.data || {}).conv || '';
+  const conv = (e.notification.data || {}).conv || '', view = (e.notification.data || {}).view || '';
   e.waitUntil((async () => {
     const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const w of wins) { try { await w.focus(); w.postMessage({ type: 'openChat', conv }); return; } catch (x) {} }
-    await self.clients.openWindow('./?chat=' + encodeURIComponent(conv) + '#chat');
+    for (const w of wins) { try { await w.focus(); w.postMessage(view && !conv ? { type: 'openView', view } : { type: 'openChat', conv }); return; } catch (x) {} }
+    await self.clients.openWindow(view && !conv ? './#' + encodeURIComponent(view) : './?chat=' + encodeURIComponent(conv) + '#chat');
   })());
 });
