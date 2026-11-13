@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611130253"></script>
+<script src="config.js?v=202611130309"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1499,8 +1499,8 @@ table.sk tbody th{text-align:start;position:sticky;inset-inline-start:0;backgrou
 
 /* ---------- تاريخ العربة: رسمة كبيرة واقفة على القضبان ---------- */
 .ch-head{min-height:250px;padding:20px 24px;align-items:center}
-.ch-art{flex:1 1 420px;max-width:600px;margin-inline-start:auto;display:flex;flex-direction:column;align-items:center;gap:10px}
-.ch-stage{width:100%;height:clamp(150px,19vw,252px);margin-top:4px}
+.ch-art{flex:1 1 560px;max-width:780px;margin-inline-start:auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+.ch-stage{width:100%;height:clamp(110px,14.5vw,215px);margin-top:4px}
 .ch-stage .track3d{height:120px;bottom:-14px}
 .ch-stage .car3d{inset-inline:3%;bottom:30px}
 .ch-stage .car3d svg{filter:drop-shadow(0 12px 10px rgba(15,23,42,.3))}
@@ -1510,7 +1510,7 @@ table.sk tbody th{text-align:start;position:sticky;inset-inline-start:0;backgrou
 .ch-lbl{font-size:17px!important;color:var(--muted)}
 .ch-cname small{color:var(--muted);font-weight:700;font-size:12.5px}
 .ch-cname .rg-t b{font-size:17px}.ch-cname .rg-t small{font-size:9px}
-@media (max-width:860px){ .ch-art{flex-basis:100%;max-width:none;order:-1} .ch-head{padding:16px} .ch-stage{height:150px} .ch-stage .track3d{height:90px} .ch-stage .car3d{bottom:22px} }
+@media (max-width:860px){ .ch-art{flex-basis:100%;max-width:none;order:-1} .ch-head{padding:16px} .ch-stage{height:112px} .ch-stage .track3d{height:80px} .ch-stage .car3d{bottom:22px} }
 .ch-evb{flex:1;min-width:0}
 .ch-ph{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:10px}
 .ch-pt{border:0;padding:0;border-radius:12px;overflow:hidden;cursor:zoom-in;background:var(--gray-l);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
@@ -3230,71 +3230,76 @@ function ensureCarDefs(){
 }
 /* رسمة جانبية: DTC بكابينة قيادة (وش أسود ملفوف بالأصفر) — MC1 / MC2 / MCI من غير كابينة — والاتنين 4 أبواب مزدوجة بشبابيك طويلة مدوّرة */
 /* البوجي: أصفر (بوجي الإنتاج المؤقت) في كل المحطات — وفي محطة #19 (التركيب على العربات الدوارة) بوجي التشغيل الحقيقي: أسود لامع */
+var CAR_UID = 0;
 function carSVG(type, work, realBogie, detail){
   var dtc = type === 'DTC';
-  var clip = dtc ? 'url(#clipDTC)' : 'url(#clipMC)';
   var glass = work ? 'url(#cgLit)' : 'url(#cgGlass)';
-  var bodyPath = dtc ? 'M32 5H169Q173 5 173 8.5V42H11Q5.5 42 5 36.5L4.4 24Q4.6 9.5 19 6.2Q25 5 32 5Z' : 'M7 8.5Q7 5 11 5H169Q173 5 173 8.5V42H7Z';
-  var x0 = dtc ? 24 : 7, x1 = 173;
-  var h = '<svg viewBox="' + (detail ? '0 -3.5 180 64' : '0 0 180 60') + '" role="img" aria-label="' + (dtc ? 'عربة DTC بكابينة قيادة' : 'عربة ' + esc(type || 'مترو')) + '"><g class="bodyg">';
-  // السقف: وحدات التكييف
-  if (!detail) h += '<rect x="52" y="1.2" width="30" height="4.4" rx="1.6" fill="#c9d3dc" stroke="#9aa6b2" stroke-width=".4"/><rect x="112" y="1.2" width="30" height="4.4" rx="1.6" fill="#c9d3dc" stroke="#9aa6b2" stroke-width=".4"/>';
-  else [[36, 46], [110, 46]].forEach(function(u, n){
-    // وحدة تكييف فوق العربة (أطول ناحية طرف العربة): قاعدة + جسم + شبكة تهوية + مروحتين
-    var ax = u[0], L = u[1];
+  // المقاسات: ضلفة الباب 13.2 — مسافة الشبابيك بين كل بابين 30.8 — ومسافة واسعة قبل أول باب وبعد آخر باب (فيها شباك)
+  var LW = 13.2, DW = LW * 2 + .2, GAP = 30.8, END = 30;
+  var start = dtc ? 39.4 : 7;                 // في الـ DTC: بعد باب الكابينة
+  var doors = [], x = start + END;
+  for (var d = 0; d < 4; d++){ doors.push(+x.toFixed(1)); x += DW + GAP; }
+  var x1 = +(doors[3] + DW + END).toFixed(1), x0 = dtc ? 24 : 7, W = x1 + 7;
+  var cp = 'cpc' + (++CAR_UID);
+  var bodyPath = dtc ? 'M32 5H' + (x1 - 4) + 'Q' + x1 + ' 5 ' + x1 + ' 8.5V42H11Q5.5 42 5 36.5L4.4 24Q4.6 9.5 19 6.2Q25 5 32 5Z' : 'M7 8.5Q7 5 11 5H' + (x1 - 4) + 'Q' + x1 + ' 5 ' + x1 + ' 8.5V42H7Z';
+  var h = '<svg viewBox="' + (detail ? '0 -3.5 ' + W + ' 64' : '0 0 ' + W + ' 60') + '" role="img" aria-label="' + (dtc ? 'عربة DTC بكابينة قيادة' : 'عربة ' + esc(type || 'مترو')) + '"><defs><clipPath id="' + cp + '"><path d="' + bodyPath + '"/></clipPath></defs><g class="bodyg">';
+  // السقف: وحدتين تكييف
+  // وحدتين التكييف: طويلين ناحية طرفي العربة (الطرف الجوّاني ثابت، والطول زايد للخارج)
+  var len = x1 - x0, acA = x0 + len * .1, acL = +((len * .2 + (detail ? 54 : 40)) - len * .1).toFixed(1), acB = x1 - len * .1 - acL;
+  if (!detail) [acA, acB].forEach(function(ax){ h += '<rect x="' + ax.toFixed(1) + '" y="1.2" width="' + acL + '" height="4.4" rx="1.6" fill="#c9d3dc" stroke="#9aa6b2" stroke-width=".4"/>'; });
+  else [acA, acB].forEach(function(ax){
+    // وحدة تكييف فوق العربة: قاعدة + جسم + شبكة تهوية + مروحتين
+    var L = acL; ax = +ax.toFixed(1);
     h += '<g class="acu"><rect x="' + (ax - 1) + '" y="3.6" width="' + (L + 2) + '" height="1.8" rx=".5" fill="#8b97a4"/>' +
       '<path d="M' + ax + ' 3.8V-.6Q' + ax + ' -2.6 ' + (ax + 2.4) + ' -2.6H' + (ax + L - 2.4) + 'Q' + (ax + L) + ' -2.6 ' + (ax + L) + ' -.6V3.8Z" fill="url(#cgAC)" stroke="#8a96a3" stroke-width=".4"/>' +
       '<path d="M' + (ax + 1) + ' -1.9H' + (ax + L - 1) + '" stroke="#fff" stroke-width=".5" opacity=".8"/>';
-    for (var g = 0; g < 9; g++) h += '<rect x="' + (ax + L / 2 - 5.2 + g * 1.2).toFixed(1) + '" y="-1" width=".55" height="4" fill="#7d8996"/>';
-    [ax + 6.5, ax + L - 6.5].forEach(function(fx){ h += '<circle cx="' + fx + '" cy=".9" r="2.3" fill="#c3ccd6" stroke="#7d8996" stroke-width=".35"/><path d="M' + (fx - 1.9) + ' .9H' + (fx + 1.9) + 'M' + fx + ' -1V2.8" stroke="#5f6b78" stroke-width=".5"/><circle cx="' + fx + '" cy=".9" r=".55" fill="#5f6b78"/>'; });
+    [L / 2 - 14, L / 2 + 1.5].forEach(function(gx){ for (var g = 0; g < 11; g++) h += '<rect x="' + (ax + gx + g * 1.2).toFixed(1) + '" y="-1" width=".55" height="4" fill="#7d8996"/>'; });
+    [ax + 7, ax + L - 7].forEach(function(fx){ h += '<circle cx="' + fx + '" cy=".9" r="2.3" fill="#c3ccd6" stroke="#7d8996" stroke-width=".35"/><path d="M' + (fx - 1.9) + ' .9H' + (fx + 1.9) + 'M' + fx + ' -1V2.8" stroke="#5f6b78" stroke-width=".5"/><circle cx="' + fx + '" cy=".9" r=".55" fill="#5f6b78"/>'; });
     h += '</g>';
   });
   // الجسم: رمادي تحت + أصفر + تركواز فوق (متقصوصين على شكل العربة)
-  h += '<g clip-path="' + clip + '"><rect x="0" y="0" width="180" height="44" fill="url(#cgGray)"/>' +
-       '<rect x="0" y="0" width="180" height="26.2" fill="url(#cgTeal)"/>' +
-       '<rect x="0" y="4.6" width="180" height="2.2" fill="url(#cgRoof)" opacity=".85"/>' +
-       '<rect x="0" y="26.2" width="180" height="4.4" fill="url(#cgYel)"/>';
+  h += '<g clip-path="url(#' + cp + ')"><rect x="0" y="0" width="' + W + '" height="44" fill="url(#cgGray)"/>' +
+       '<rect x="0" y="0" width="' + W + '" height="26.2" fill="url(#cgTeal)"/>' +
+       '<rect x="0" y="4.6" width="' + W + '" height="2.2" fill="url(#cgRoof)" opacity=".85"/>' +
+       '<rect x="0" y="26.2" width="' + W + '" height="4.4" fill="url(#cgYel)"/>';
   if (dtc) h += '<path d="M26 26.2V30.6Q13 31.4 4.9 37.5L4.7 33.2Q12.5 27 26 26.2Z" fill="url(#cgYel)"/>' +
        '<path d="M4.5 29Q4.3 11 18.5 7.2Q22 6.4 25.5 6.4V23.8Q14 24.6 4.5 29Z" fill="url(#cgMask)"/>' +
        '<path d="M8 21Q9.5 12.5 18 9.4" stroke="#8fa3bd" stroke-width=".9" fill="none" opacity=".75"/>';
   // لمعة ثابتة + لمعة بتعدي
-  h += '<rect x="0" y="7.4" width="180" height="1.6" fill="#fff" opacity=".55"/><rect x="0" y="31.4" width="180" height="1.1" fill="#fff" opacity=".5"/>' +
+  h += '<rect x="0" y="7.4" width="' + W + '" height="1.6" fill="#fff" opacity=".55"/><rect x="0" y="31.4" width="' + W + '" height="1.1" fill="#fff" opacity=".5"/>' +
        '<rect class="sheen" x="-80" y="0" width="34" height="44" fill="url(#cgSheen)"/></g>';
   h += '<path d="' + bodyPath + '" fill="none" stroke="#0e7f73" stroke-width=".55" opacity=".7"/>';
   // نهايات العربة
   if (!dtc) h += '<rect x="7" y="9" width="2.4" height="32" rx=".8" fill="#2b3138" opacity=".55"/>';
-  h += '<rect x="170.6" y="9" width="2.4" height="32" rx=".8" fill="#2b3138" opacity=".55"/>';
+  h += '<rect x="' + (x1 - 2.4) + '" y="9" width="2.4" height="32" rx=".8" fill="#2b3138" opacity=".55"/>';
   // باب الكابينة (DTC)
   if (dtc) h += '<rect x="27" y="9.5" width="12.4" height="31.5" rx=".8" fill="none" stroke="#1b1f24" stroke-width=".55"/><rect x="29.2" y="11.5" width="8" height="9" rx="2" fill="' + glass + '" stroke="#0b0d10" stroke-width=".5"/><rect x="36.6" y="24" width=".9" height="3.2" rx=".4" fill="#1b1f24"/>';
-  // 4 أبواب مزدوجة + شبابيك عريضة بينهم
-  // الأبواب متوزعة على طول العربة بمسافات شبابيك عريضة بينها (زي العربية الحقيقية)
-  var LW = 13.2, DW = LW * 2 + .2, M = dtc ? 1.3 : 2.2;   // ضلفة الباب ضعف العرض القديم
-  var doors = dtc ? [43.6, 77.3, 111, 144.7] : [13, 55.5, 98, 140.5];
+  // الشبابيك بين كل بابين بس — قبل أول باب وبعد آخر باب (وبين باب الكابينة وأول باب) جسم العربية عادي
   var segs = [];
-  var prev = dtc ? 40.3 : 9.5;   // في الـ DTC: بعد باب الكابينة
-  doors.forEach(function(x){ segs.push([prev + M, x - M]); prev = x + DW; });
-  segs.push([prev + 2.2, 168.5]);
+  for (var sI = 0; sI < doors.length - 1; sI++) segs.push([doors[sI] + DW + 2.2, doors[sI + 1] - 2.2]);
   segs.forEach(function(w){
-    var wd = w[1] - w[0]; if (wd < 3) return;
+    var wd = w[1] - w[0]; if (wd < 5) return;
     h += '<rect class="cabin" x="' + w[0].toFixed(1) + '" y="11" width="' + wd.toFixed(1) + '" height="12.4" rx="2.6" fill="' + glass + '" stroke="#0b0d10" stroke-width="1.1"/>';
   });
-  doors.forEach(function(x){
-    [x, x + LW + .2].forEach(function(lx){
+  // 4 أبواب مزدوجة
+  doors.forEach(function(dx){
+    [dx, dx + LW + .2].forEach(function(lx){
       h += '<rect x="' + lx.toFixed(1) + '" y="9" width="' + LW + '" height="32.4" rx=".7" fill="none" stroke="#1b1f24" stroke-width=".55"/>' +
            '<rect class="cabin" x="' + (lx + 1.3).toFixed(1) + '" y="11" width="' + (LW - 2.6).toFixed(1) + '" height="11.8" rx="2" fill="' + glass + '" stroke="#0b0d10" stroke-width=".8"/>';
     });
-    h += '<rect x="' + (x - .4).toFixed(1) + '" y="41" width="' + (DW + .8).toFixed(1) + '" height="1.4" rx=".5" fill="#8d949c"/>';
+    h += '<rect x="' + (dx - .4).toFixed(1) + '" y="41" width="' + (DW + .8).toFixed(1) + '" height="1.4" rx=".5" fill="#8d949c"/>';
   });
   // الكشافات (DTC)
   if (dtc) h += '<circle cx="7.4" cy="31.6" r="1.5" fill="#f4f6f8" stroke="#8d949c" stroke-width=".5"/>';
   // الشاسيه ومعدات تحت العربة
   h += '<rect x="' + (x0 + 2) + '" y="42" width="' + (x1 - x0 - 4) + '" height="2.2" fill="#2a2f36"/>';
-  [[60, 22], [92, 16], [114, 12]].forEach(function(e){ h += '<rect x="' + e[0] + '" y="43.6" width="' + e[1] + '" height="4.2" rx=".8" fill="#353b43" stroke="#1d2126" stroke-width=".4"/>'; });
+  var mid = (x0 + x1) / 2;
+  [[mid - 52, 30], [mid - 14, 22], [mid + 16, 16], [mid + 38, 12]].forEach(function(e){ h += '<rect x="' + e[0].toFixed(1) + '" y="43.6" width="' + e[1] + '" height="4.2" rx=".8" fill="#353b43" stroke="#1d2126" stroke-width=".4"/>'; });
   h += '</g>';
   // البوجيهات: شاسيه جانبي + يايات + صناديق محاور + موتور + عجلتين
   var bogFill = realBogie ? 'url(#cgBogK)' : 'url(#cgBogY)', bogStroke = realBogie ? '#000' : '#a77700';
   var motorFill = realBogie ? '#23272d' : '#d99e00', boxFill = realBogie ? '#2c3138' : '#c48d00';
-  [x0 + 25, x1 - 25].forEach(function(cx){
+  [x0 + 32, x1 - 32].forEach(function(cx){
     if (detail) { h += bogieReal(cx, realBogie); return; }
     h += '<g class="bogie">' +
       '<path d="M' + (cx - 17) + ' 44.2H' + (cx + 17) + 'L' + (cx + 14) + ' 50.2H' + (cx - 14) + 'Z" fill="' + bogFill + '" stroke="' + bogStroke + '" stroke-width=".5"/>' +
@@ -5375,7 +5380,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611130253').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611130309').catch(function(){}); });
 </script>
 </body>
 </html>
