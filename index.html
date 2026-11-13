@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611130036"></script>
+<script src="config.js?v=202611130253"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -695,6 +695,7 @@ body.wide-page main{max-width:none}
 .cav{flex:0 0 42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff;background:linear-gradient(135deg,#3b82f6,#6d28d9)}
 .cav.all{background:linear-gradient(135deg,#0a5cff,#06b6d4);font-size:20px}
 .cav.all.q{background:linear-gradient(135deg,#7c3aed,#db2777)}
+.cav.all.p{background:linear-gradient(135deg,#0d9488,#f59e0b)}
 .cmeta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .ctop,.cbot{display:flex;align-items:center;gap:8px}
 .ctop b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px}
@@ -1231,7 +1232,7 @@ body.ds-C{background:var(--bg)!important}
 .lv-tickrow .lv-tick{flex:1}
 .lv-tickrow .lv-on{flex-direction:row;gap:8px;margin-inline-start:auto}
 .lv-row .lv-on{display:none}
-@media (max-width:860px){ .lv-row .lv-on{display:flex} .lv-tickrow .lv-on{display:none} .lv-tickrow .lv-tick{flex:1 1 auto} .lv-tickrow>span:empty{display:none} }
+@media (max-width:860px){ .lv-row .lv-on{display:flex} .lv-tickrow .lv-on{display:none} .lv-tickrow .lv-tick{flex:1 1 auto!important} .lv-tickrow>span:empty{display:none} }
 .lv-tick{display:flex;align-items:center;gap:8px;min-width:0;padding:5px 6px 5px 10px;border-radius:12px;background:color-mix(in srgb,var(--stopc) 7%,var(--card));border:1px solid color-mix(in srgb,var(--stopc) 22%,var(--line))}
 .lv-tag{flex:0 0 auto;font-size:15px}
 .lv-track{flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
@@ -1428,11 +1429,15 @@ table.sk tbody th{text-align:start;position:sticky;inset-inline-start:0;backgrou
 @media (min-width:861px){
   #menuBtn{order:0} .brand{order:1;flex:0 1 auto;max-width:300px} .live{order:2;flex:1 1 0;min-width:0;align-items:center;margin-inline:22px}
   .lv-shift{min-width:0}
-  .lv-counts{grid-template-columns:repeat(3,minmax(78px,1fr));gap:6px;flex:0 1 auto}
+  .lv-counts{grid-template-columns:repeat(4,minmax(74px,1fr));gap:6px;flex:0 1 auto}
+  .lv-shift{padding:5px 12px;gap:1px;border-radius:14px}
+  .lv-clock{font-size:19px}
+  .lv-top{gap:8px} .lv-sh{font-size:12px} .lv-bar{height:3px}
   .lvc{display:grid;grid-template-columns:auto auto;justify-content:center;align-items:center;column-gap:5px;padding:6px 6px;min-width:0}
   .lvc i{font-size:15px} .lvc b{font-size:19px}
   .lvc span{grid-column:1/-1;text-align:center;font-size:11px;overflow:hidden;text-overflow:ellipsis;min-width:0}
-  .lv-row{justify-content:center}
+  .lv-row{justify-content:flex-start;align-items:center}
+  .live{margin-inline:14px 18px}
   .whoav{order:3} .who{order:4} #themeBtn{order:5} #refreshBtn{order:6}
   .lv-tickwrap{order:9} .topnav{order:10}
   /* القوائم كلها ظاهرة في صفحة واحدة (تحت بعض) */
@@ -1492,21 +1497,20 @@ table.sk tbody th{text-align:start;position:sticky;inset-inline-start:0;backgrou
 @media (max-width:860px){ .ds-hero{grid-template-columns:1fr} .ds-kpis{grid-template-columns:repeat(3,minmax(0,1fr))} }
 @media (prefers-reduced-motion:reduce){ .ds-k{animation:none} }
 
-/* ---------- تاريخ العربة: رسمة كبيرة بموشن وانعكاس ---------- */
-.ch-head{min-height:250px;padding:22px 24px;align-items:center}
-.ch-art{flex:1 1 380px;max-width:580px;margin-inline-start:auto;display:flex;flex-direction:column;align-items:center;gap:6px}
-.ca-svg{width:100%;height:auto;overflow:visible}
-.ca-car{animation:caBob 4.2s ease-in-out infinite}
-@keyframes caBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-.ca-wh{animation:caWheel 3s linear infinite}
-@keyframes caWheel{to{transform:rotate(360deg)}}
-.ca-shine{transform:skewX(-20deg);animation:caShine 5.2s ease-in-out infinite}
-@keyframes caShine{0%,30%{transform:skewX(-20deg) translateX(0)}75%,100%{transform:skewX(-20deg) translateX(860px)}}
-.ca-lamp{animation:caLamp 2.4s ease-in-out infinite}
-@keyframes caLamp{0%,100%{opacity:.55}50%{opacity:1}}
-.ch-art-l{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-@media (max-width:860px){ .ch-art{flex-basis:100%;max-width:none;order:-1} .ch-head{padding:16px} }
-@media (prefers-reduced-motion:reduce){ .ca-car,.ca-wh,.ca-shine,.ca-lamp{animation:none} }
+/* ---------- تاريخ العربة: رسمة كبيرة واقفة على القضبان ---------- */
+.ch-head{min-height:250px;padding:20px 24px;align-items:center}
+.ch-art{flex:1 1 420px;max-width:600px;margin-inline-start:auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+.ch-stage{width:100%;height:clamp(150px,19vw,252px);margin-top:4px}
+.ch-stage .track3d{height:120px;bottom:-14px}
+.ch-stage .car3d{inset-inline:3%;bottom:30px}
+.ch-stage .car3d svg{filter:drop-shadow(0 12px 10px rgba(15,23,42,.3))}
+.ch-stage .car3d .shadow{bottom:-8px;height:16px}
+.ch-cname{display:flex;align-items:center;gap:12px;justify-content:center}
+.ch-cname b{display:block;font-size:20px;font-weight:900}
+.ch-lbl{font-size:17px!important;color:var(--muted)}
+.ch-cname small{color:var(--muted);font-weight:700;font-size:12.5px}
+.ch-cname .rg-t b{font-size:17px}.ch-cname .rg-t small{font-size:9px}
+@media (max-width:860px){ .ch-art{flex-basis:100%;max-width:none;order:-1} .ch-head{padding:16px} .ch-stage{height:150px} .ch-stage .track3d{height:90px} .ch-stage .car3d{bottom:22px} }
 .ch-evb{flex:1;min-width:0}
 .ch-ph{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:10px}
 .ch-pt{border:0;padding:0;border-radius:12px;overflow:hidden;cursor:zoom-in;background:var(--gray-l);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
@@ -1880,8 +1884,6 @@ function navItems(){
   var r = role();
   var items = [
     { id:'dashboard', t:'لوحة المتابعة', ic: ICO_CHART, b:1 },
-    { id:'tasks', t:'المهام اليومية', ic:'📋' },
-    { id:'meetings', t:'الاجتماعات', ic:'📅' },
     { id:'board', t:'لوحة الخطوط', ic:'🚄', b:1 },
     { id:'stop', t:'التوقفات', ic:'⏸️' },
     { id:'issue', t:'المشكلات', ic:'⚠️' },
@@ -1897,7 +1899,11 @@ function navItems(){
   var iIssue = items.map(function(n){ return n.id; }).indexOf('issue') + 1;
   items.splice(iIssue, 0, { id:'material', t:'الخامات', ic:'📦' }, { id:'safety', t:'السلامة', ic:'⛑️' });
   items.splice(items.map(function(n){ return n.id; }).indexOf('board') + 1, 0, { id:'cars', t:'تاريخ العربة', ic:'🚃' });
-  items.splice(items.map(function(n){ return n.id; }).indexOf('chat'), 0, { id:'handover', t:'ملخص اليوم', ic:'📝' }, { id:'skills', t:'المهارات', ic:'🎓' }, { id:'techs', t:'الفنيين', ic:'👷' });
+  if (canWrite()) items.splice(1, 0, { id:'tasks', t:'المهام اليومية', ic:'📋' }, { id:'meetings', t:'الاجتماعات', ic:'📅' });
+  var extra = [];
+  if (isMgr()) extra.push({ id:'handover', t:'ملخص اليوم', ic:'📝' });
+  if (canWrite()) extra.push({ id:'skills', t:'المهارات', ic:'🎓' }, isMgr() ? { id:'techs', t:'الفنيين', ic:'👷' } : { id:'techs', t:'صفحتي', ic:'👤' });
+  items.splice.apply(items, [items.map(function(n){ return n.id; }).indexOf('chat'), 0].concat(extra));
   if (isMgr()) items.push({ id:'exceptions', t:'الاستثناءات', ic:'🚩' });
   if (own) items.push({ id:'reports', t:'تقارير الإنتاج', ic:'📑' });          // تقارير الإنتاج للمسؤول بس
   if (B().canQReports) items.push({ id:'qreports', t:'تقارير الجودة', ic:'🧾' });   // تقارير الجودة: المسؤول ومشرف الجودة
@@ -3214,6 +3220,9 @@ function ensureCarDefs(){
     '<linearGradient id="cgBogK" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a616c"/><stop offset=".22" stop-color="#1c2026"/><stop offset=".6" stop-color="#0d0f12"/><stop offset="1" stop-color="#000"/></linearGradient>' +
     '<radialGradient id="cgWheel"><stop offset="0" stop-color="#5b626c"/><stop offset=".6" stop-color="#22262c"/><stop offset="1" stop-color="#0b0d10"/></radialGradient>' +
     '<radialGradient id="cgBeam" cx="0" cy=".5" r="1"><stop offset="0" stop-color="#fff7c2" stop-opacity=".95"/><stop offset="1" stop-color="#fff7c2" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="cgWheelR"><stop offset=".7" stop-color="#3a4048"/><stop offset=".92" stop-color="#9aa3ad"/><stop offset="1" stop-color="#4b525b"/></radialGradient>' +
+    '<radialGradient id="cgDisc" cx=".38" cy=".35"><stop offset="0" stop-color="#8d96a1"/><stop offset=".6" stop-color="#4f5762"/><stop offset="1" stop-color="#2b3139"/></radialGradient>' +
+    '<linearGradient id="cgAC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f7fa"/><stop offset=".6" stop-color="#d5dde5"/><stop offset="1" stop-color="#aab5c1"/></linearGradient>' +
     '<clipPath id="clipMC"><path d="M7 8.5Q7 5 11 5H169Q173 5 173 8.5V42H7Z"/></clipPath>' +
     '<clipPath id="clipDTC"><path d="M32 5H169Q173 5 173 8.5V42H11Q5.5 42 5 36.5L4.4 24Q4.6 9.5 19 6.2Q25 5 32 5Z"/></clipPath>' +
     '</defs></svg>';
@@ -3221,15 +3230,25 @@ function ensureCarDefs(){
 }
 /* رسمة جانبية: DTC بكابينة قيادة (وش أسود ملفوف بالأصفر) — MC1 / MC2 / MCI من غير كابينة — والاتنين 4 أبواب مزدوجة بشبابيك طويلة مدوّرة */
 /* البوجي: أصفر (بوجي الإنتاج المؤقت) في كل المحطات — وفي محطة #19 (التركيب على العربات الدوارة) بوجي التشغيل الحقيقي: أسود لامع */
-function carSVG(type, work, realBogie){
+function carSVG(type, work, realBogie, detail){
   var dtc = type === 'DTC';
   var clip = dtc ? 'url(#clipDTC)' : 'url(#clipMC)';
   var glass = work ? 'url(#cgLit)' : 'url(#cgGlass)';
   var bodyPath = dtc ? 'M32 5H169Q173 5 173 8.5V42H11Q5.5 42 5 36.5L4.4 24Q4.6 9.5 19 6.2Q25 5 32 5Z' : 'M7 8.5Q7 5 11 5H169Q173 5 173 8.5V42H7Z';
   var x0 = dtc ? 24 : 7, x1 = 173;
-  var h = '<svg viewBox="0 0 180 60" role="img" aria-label="' + (dtc ? 'عربة DTC بكابينة قيادة' : 'عربة ' + esc(type || 'مترو')) + '"><g class="bodyg">';
+  var h = '<svg viewBox="' + (detail ? '0 -3.5 180 64' : '0 0 180 60') + '" role="img" aria-label="' + (dtc ? 'عربة DTC بكابينة قيادة' : 'عربة ' + esc(type || 'مترو')) + '"><g class="bodyg">';
   // السقف: وحدات التكييف
-  h += '<rect x="52" y="1.2" width="30" height="4.4" rx="1.6" fill="#c9d3dc" stroke="#9aa6b2" stroke-width=".4"/><rect x="112" y="1.2" width="30" height="4.4" rx="1.6" fill="#c9d3dc" stroke="#9aa6b2" stroke-width=".4"/>';
+  if (!detail) h += '<rect x="52" y="1.2" width="30" height="4.4" rx="1.6" fill="#c9d3dc" stroke="#9aa6b2" stroke-width=".4"/><rect x="112" y="1.2" width="30" height="4.4" rx="1.6" fill="#c9d3dc" stroke="#9aa6b2" stroke-width=".4"/>';
+  else [[36, 46], [110, 46]].forEach(function(u, n){
+    // وحدة تكييف فوق العربة (أطول ناحية طرف العربة): قاعدة + جسم + شبكة تهوية + مروحتين
+    var ax = u[0], L = u[1];
+    h += '<g class="acu"><rect x="' + (ax - 1) + '" y="3.6" width="' + (L + 2) + '" height="1.8" rx=".5" fill="#8b97a4"/>' +
+      '<path d="M' + ax + ' 3.8V-.6Q' + ax + ' -2.6 ' + (ax + 2.4) + ' -2.6H' + (ax + L - 2.4) + 'Q' + (ax + L) + ' -2.6 ' + (ax + L) + ' -.6V3.8Z" fill="url(#cgAC)" stroke="#8a96a3" stroke-width=".4"/>' +
+      '<path d="M' + (ax + 1) + ' -1.9H' + (ax + L - 1) + '" stroke="#fff" stroke-width=".5" opacity=".8"/>';
+    for (var g = 0; g < 9; g++) h += '<rect x="' + (ax + L / 2 - 5.2 + g * 1.2).toFixed(1) + '" y="-1" width=".55" height="4" fill="#7d8996"/>';
+    [ax + 6.5, ax + L - 6.5].forEach(function(fx){ h += '<circle cx="' + fx + '" cy=".9" r="2.3" fill="#c3ccd6" stroke="#7d8996" stroke-width=".35"/><path d="M' + (fx - 1.9) + ' .9H' + (fx + 1.9) + 'M' + fx + ' -1V2.8" stroke="#5f6b78" stroke-width=".5"/><circle cx="' + fx + '" cy=".9" r=".55" fill="#5f6b78"/>'; });
+    h += '</g>';
+  });
   // الجسم: رمادي تحت + أصفر + تركواز فوق (متقصوصين على شكل العربة)
   h += '<g clip-path="' + clip + '"><rect x="0" y="0" width="180" height="44" fill="url(#cgGray)"/>' +
        '<rect x="0" y="0" width="180" height="26.2" fill="url(#cgTeal)"/>' +
@@ -3246,23 +3265,25 @@ function carSVG(type, work, realBogie){
   if (!dtc) h += '<rect x="7" y="9" width="2.4" height="32" rx=".8" fill="#2b3138" opacity=".55"/>';
   h += '<rect x="170.6" y="9" width="2.4" height="32" rx=".8" fill="#2b3138" opacity=".55"/>';
   // باب الكابينة (DTC)
-  if (dtc) h += '<rect x="27" y="9.5" width="6.2" height="31.5" rx=".8" fill="none" stroke="#1b1f24" stroke-width=".55"/><rect x="28.3" y="11.5" width="3.6" height="9" rx="1.6" fill="' + glass + '" stroke="#0b0d10" stroke-width=".5"/>';
+  if (dtc) h += '<rect x="27" y="9.5" width="12.4" height="31.5" rx=".8" fill="none" stroke="#1b1f24" stroke-width=".55"/><rect x="29.2" y="11.5" width="8" height="9" rx="2" fill="' + glass + '" stroke="#0b0d10" stroke-width=".5"/><rect x="36.6" y="24" width=".9" height="3.2" rx=".4" fill="#1b1f24"/>';
   // 4 أبواب مزدوجة + شبابيك عريضة بينهم
-  var doors = dtc ? [52, 84, 116, 148] : [22, 60, 98, 136];
+  // الأبواب متوزعة على طول العربة بمسافات شبابيك عريضة بينها (زي العربية الحقيقية)
+  var LW = 13.2, DW = LW * 2 + .2, M = dtc ? 1.3 : 2.2;   // ضلفة الباب ضعف العرض القديم
+  var doors = dtc ? [43.6, 77.3, 111, 144.7] : [13, 55.5, 98, 140.5];
   var segs = [];
-  var prev = dtc ? 35.5 : 9.5;   // في الـ DTC: مسافة واضحة بين باب الكابينة وأول شباك
-  doors.forEach(function(x){ segs.push([prev + 2.2, x - 2.2]); prev = x + 15.2; });
+  var prev = dtc ? 40.3 : 9.5;   // في الـ DTC: بعد باب الكابينة
+  doors.forEach(function(x){ segs.push([prev + M, x - M]); prev = x + DW; });
   segs.push([prev + 2.2, 168.5]);
   segs.forEach(function(w){
-    var wd = w[1] - w[0]; if (wd < 5) return;
+    var wd = w[1] - w[0]; if (wd < 3) return;
     h += '<rect class="cabin" x="' + w[0].toFixed(1) + '" y="11" width="' + wd.toFixed(1) + '" height="12.4" rx="2.6" fill="' + glass + '" stroke="#0b0d10" stroke-width="1.1"/>';
   });
   doors.forEach(function(x){
-    [x, x + 7.6].forEach(function(lx){
-      h += '<rect x="' + lx + '" y="9" width="7.4" height="32.4" rx=".7" fill="none" stroke="#1b1f24" stroke-width=".55"/>' +
-           '<rect class="cabin" x="' + (lx + 1.5) + '" y="11" width="4.4" height="11.8" rx="2.2" fill="' + glass + '" stroke="#0b0d10" stroke-width=".8"/>';
+    [x, x + LW + .2].forEach(function(lx){
+      h += '<rect x="' + lx.toFixed(1) + '" y="9" width="' + LW + '" height="32.4" rx=".7" fill="none" stroke="#1b1f24" stroke-width=".55"/>' +
+           '<rect class="cabin" x="' + (lx + 1.3).toFixed(1) + '" y="11" width="' + (LW - 2.6).toFixed(1) + '" height="11.8" rx="2" fill="' + glass + '" stroke="#0b0d10" stroke-width=".8"/>';
     });
-    h += '<rect x="' + (x - .4) + '" y="41" width="15.8" height="1.4" rx=".5" fill="#8d949c"/>';
+    h += '<rect x="' + (x - .4).toFixed(1) + '" y="41" width="' + (DW + .8).toFixed(1) + '" height="1.4" rx=".5" fill="#8d949c"/>';
   });
   // الكشافات (DTC)
   if (dtc) h += '<circle cx="7.4" cy="31.6" r="1.5" fill="#f4f6f8" stroke="#8d949c" stroke-width=".5"/>';
@@ -3274,6 +3295,7 @@ function carSVG(type, work, realBogie){
   var bogFill = realBogie ? 'url(#cgBogK)' : 'url(#cgBogY)', bogStroke = realBogie ? '#000' : '#a77700';
   var motorFill = realBogie ? '#23272d' : '#d99e00', boxFill = realBogie ? '#2c3138' : '#c48d00';
   [x0 + 25, x1 - 25].forEach(function(cx){
+    if (detail) { h += bogieReal(cx, realBogie); return; }
     h += '<g class="bogie">' +
       '<path d="M' + (cx - 17) + ' 44.2H' + (cx + 17) + 'L' + (cx + 14) + ' 50.2H' + (cx - 14) + 'Z" fill="' + bogFill + '" stroke="' + bogStroke + '" stroke-width=".5"/>' +
       '<path d="M' + (cx - 16) + ' 44.9H' + (cx + 16) + '" stroke="#fff" stroke-width=".7" opacity="' + (realBogie ? '.55' : '.45') + '"/>' +
@@ -3290,6 +3312,65 @@ function carSVG(type, work, realBogie){
     h += '</g>';
   });
   return h + '</svg>';
+}
+/* بوجي بتفاصيل حقيقية (صفحة تاريخ العربة): شاسيه جانبي واطي في النص + يايات أولية فوق صناديق المحاور + مساعدين
+   + وسادة هوائية (تعليق ثانوي) + موتور جر بزعانف + جيربوكس + وحدات فرامل على العجل + مساعد «ياو» + هوائي ATP + عجل قرص مصمت بحافة */
+function bogieReal(cx, real){
+  var F = real ? 'url(#cgBogK)' : 'url(#cgBogY)', S = real ? '#000' : '#8a6000', rv = real ? '#9aa3ad' : '#6b4b00';
+  var box = real ? '#30363e' : '#d99e00', boxHi = real ? '#4a525c' : '#f2bd2a';
+  var f = function(n){ return (+n).toFixed(2); };
+  var back = '', front = '';
+  // ===== ورا: مساعد «ياو» + موتور الجر بزعانف + الجيربوكس + العجل + الفرامل =====
+  [-1, 1].forEach(function(d){ var x = cx + d * 16.8;
+    back += '<rect x="' + f(d > 0 ? x : x - 5) + '" y="44.3" width="5" height="1.6" rx=".8" fill="#3a4049"/><rect x="' + f(d > 0 ? x + 3.6 : x - 5.2) + '" y="43.6" width="1.6" height="3" rx=".4" fill="#6b737e"/>'; });
+  back += '<rect x="' + f(cx - 7.4) + '" y="48.6" width="9" height="5.6" rx="1.8" fill="#353b44" stroke="#14171b" stroke-width=".3"/>';
+  for (var k = 0; k < 7; k++) back += '<rect x="' + f(cx - 6.7 + k * 1.2) + '" y="49.2" width=".45" height="4.4" fill="#58606a"/>';
+  back += '<rect x="' + f(cx + 1.9) + '" y="49" width="4.8" height="5" rx="1.3" fill="#2a2f36" stroke="#14171b" stroke-width=".3"/><circle cx="' + f(cx + 4.3) + '" cy="51.5" r=".9" fill="#5b636d"/>';
+  [cx - 9.5, cx + 9.5].forEach(function(wx){
+    var out = wx < cx ? -1 : 1;
+    // العجلة: فلانشة + سطح دحرجة لامع + قرص مصمت + صرة بمسامير
+    back += '<g class="wh"><circle cx="' + wx + '" cy="52" r="6.3" fill="#07090c"/><circle cx="' + wx + '" cy="52" r="5.75" fill="url(#cgWheelR)"/>' +
+      '<circle cx="' + wx + '" cy="52" r="4.4" fill="url(#cgDisc)" stroke="#1e232a" stroke-width=".35"/><circle cx="' + wx + '" cy="52" r="3.1" fill="none" stroke="#8b949e" stroke-width=".3" opacity=".6"/>' +
+      '<circle cx="' + wx + '" cy="52" r="2" fill="#bfc7d0" stroke="#5b636d" stroke-width=".3"/>';
+    for (var b = 0; b < 6; b++){ var a = b * Math.PI / 3; back += '<circle cx="' + f(wx + Math.cos(a) * 1.3) + '" cy="' + f(52 + Math.sin(a) * 1.3) + '" r=".26" fill="#4b535d"/>'; }
+    back += '<circle cx="' + wx + '" cy="52" r=".6" fill="#7d8691"/></g>';
+    // وحدة فرامل على سطح العجلة من بره: كتلة الفرامل + السلندر
+    back += '<path d="M' + f(wx + out * 5.8) + ' 48.9H' + f(wx + out * 7) + 'V54.9H' + f(wx + out * 5.8) + 'Q' + f(wx + out * 6.6) + ' 51.9 ' + f(wx + out * 5.8) + ' 48.9Z" fill="#59616b" stroke="#14171b" stroke-width=".25"/>' +
+      '<rect x="' + f(out > 0 ? wx + 7 : wx - 9.9) + '" y="49.4" width="2.9" height="3.6" rx=".7" fill="#3a4049" stroke="#14171b" stroke-width=".25"/><rect x="' + f(out > 0 ? wx + 9.4 : wx - 10.4) + '" y="50.5" width="1" height="1.4" fill="#6b737e"/>';
+  });
+  // ===== قدام: الوسادة الهوائية + الشاسيه الجانبي + الياي الأولي + صناديق المحاور =====
+  front += '<rect x="' + f(cx - 6.6) + '" y="41.5" width="13.2" height="1" rx=".4" fill="#4b525b"/>' +
+    '<path d="M' + f(cx - 5.6) + ' 42.5Q' + f(cx - 6.8) + ' 43.5 ' + f(cx - 5.6) + ' 44.5H' + f(cx + 5.6) + 'Q' + f(cx + 6.8) + ' 43.5 ' + f(cx + 5.6) + ' 42.5Z" fill="#1f2328"/>' +
+    '<path d="M' + f(cx - 5.9) + ' 43.5H' + f(cx + 5.9) + '" stroke="#454c55" stroke-width=".4"/>';
+  // الشاسيه: عالي فوق صناديق المحاور وواطي في النص (شكل H من الجنب)
+  var frame = 'M' + f(cx - 17) + ' 43.9H' + f(cx - 12.4) + 'Q' + f(cx - 10.6) + ' 43.9 ' + f(cx - 9.6) + ' 45.4L' + f(cx - 8.4) + ' 47H' + f(cx + 8.4) + 'L' + f(cx + 9.6) + ' 45.4Q' + f(cx + 10.6) + ' 43.9 ' + f(cx + 12.4) + ' 43.9H' + f(cx + 17) +
+    'V46.4H' + f(cx + 13.4) + 'Q' + f(cx + 12) + ' 46.4 ' + f(cx + 11.2) + ' 47.6L' + f(cx + 9.4) + ' 50.6H' + f(cx - 9.4) + 'L' + f(cx - 11.2) + ' 47.6Q' + f(cx - 12) + ' 46.4 ' + f(cx - 13.4) + ' 46.4H' + f(cx - 17) + 'Z';
+  front += '<path d="' + frame + '" fill="' + F + '" stroke="' + S + '" stroke-width=".45"/>' +
+    '<path d="M' + f(cx - 16.4) + ' 44.5H' + f(cx - 12.4) + 'Q' + f(cx - 11) + ' 44.5 ' + f(cx - 10.1) + ' 45.8L' + f(cx - 8.8) + ' 47.6H' + f(cx + 8.8) + 'L' + f(cx + 10.1) + ' 45.8Q' + f(cx + 11) + ' 44.5 ' + f(cx + 12.4) + ' 44.5H' + f(cx + 16.4) + '" fill="none" stroke="#fff" stroke-width=".5" opacity=".6"/>' +
+    '<rect x="' + f(cx - 2.6) + '" y="47.9" width="5.2" height="1.8" rx=".3" fill="' + (real ? '#2a2f36' : '#fff3c4') + '" opacity=".9"/>' +
+    '<path d="M' + f(cx - 1.8) + ' 48.8H' + f(cx + 1.8) + '" stroke="' + (real ? '#7d8691' : '#8a6000') + '" stroke-width=".35"/>';
+  [-15.6, -14, 14, 15.6, -7, -4.5, 4.5, 7].forEach(function(o){ front += '<circle cx="' + f(cx + o) + '" cy="' + (Math.abs(o) > 13 ? 45.2 : 49.6) + '" r=".36" fill="' + rv + '"/>'; });
+  // هوائي ATP تحت مقدمة البوجي
+  front += '<rect x="' + f(cx - 16.4) + '" y="46.4" width="2.6" height="2.4" rx=".4" fill="#2a2f36"/><rect x="' + f(cx - 16.8) + '" y="48.6" width="3.4" height=".8" rx=".3" fill="#6b737e"/>';
+  [cx - 9.5, cx + 9.5].forEach(function(wx){
+    var out = wx < cx ? -1 : 1;
+    // الياي الأولي: سوستتين حلزونيتين جنب بعض فوق صندوق المحور
+    [-1.15, 1.15].forEach(function(dx){
+      var x = wx + dx, p = '<path d="M' + f(x - .95) + ' 46.6';
+      for (var c = 0; c < 4; c++) p += 'L' + f(x + .95) + ' ' + f(46.85 + c * .55) + 'L' + f(x - .95) + ' ' + f(47.1 + c * .55);
+      front += '<rect x="' + f(x - 1) + '" y="46.5" width="2" height="2.6" fill="#1d2126" opacity=".35"/>' + p + '" fill="none" stroke="#d6dde5" stroke-width=".42" stroke-linejoin="round"/>';
+    });
+    front += '<rect x="' + f(wx - 2.6) + '" y="46" width="5.2" height=".6" rx=".2" fill="#4b535d"/>';
+    // صندوق المحور (قدام العجلة) بغطا دايري ومسامير + ذراع التثبيت
+    front += '<path d="M' + f(wx - out * 2.4) + ' 50.4L' + f(wx - out * 6) + ' 48.2" stroke="' + box + '" stroke-width="1.2" stroke-linecap="round"/>' +
+      '<rect x="' + f(wx - 2.5) + '" y="49.1" width="5" height="4.6" rx="1.2" fill="' + box + '" stroke="' + S + '" stroke-width=".3"/>' +
+      '<rect x="' + f(wx - 2.1) + '" y="49.4" width="4.2" height=".7" rx=".3" fill="' + boxHi + '" opacity=".8"/>' +
+      '<circle cx="' + wx + '" cy="51.6" r="1.45" fill="' + (real ? '#454c55' : '#b37f00') + '" stroke="' + S + '" stroke-width=".25"/><circle cx="' + wx + '" cy="51.6" r=".55" fill="' + boxHi + '"/>' +
+      [[-1.9, 49.6], [1.9, 49.6], [-1.9, 53.2], [1.9, 53.2]].map(function(q){ return '<circle cx="' + f(wx + q[0]) + '" cy="' + q[1] + '" r=".24" fill="' + rv + '"/>'; }).join('') +
+      // مساعد رأسي من الشاسيه لصندوق المحور
+      '<path d="M' + f(wx + out * 3.2) + ' 45.6L' + f(wx + out * 2.9) + ' 49.6" stroke="#2c3138" stroke-width="1.05" stroke-linecap="round"/><path d="M' + f(wx + out * 3.15) + ' 46.4L' + f(wx + out * 3.05) + ' 47.6" stroke="#8b949e" stroke-width=".45" stroke-linecap="round"/>';
+  });
+  return '<g class="bogie breal">' + back + front + '</g>';
 }
 function metroCar(s){
   ensureCarDefs();
@@ -3556,7 +3637,7 @@ function loadAvatars(){
 function avHue(id){ var h = 0; String(id).split('').forEach(function(c){ h = (h * 31 + c.charCodeAt(0)) % 360; }); return h; }
 function avatarHTML(email, cls){
   cls = cls ? ' ' + cls : '';
-  if (isGroupChat(email)) return AV.map[email] ? '<span class="cav has all' + cls + '" data-av="' + email + '"><img src="' + AV.map[email] + '" alt=""></span>' : '<span class="cav all' + (email === 'QUALITY' ? ' q' : '') + cls + '" data-av="' + email + '">' + (email === 'QUALITY' ? '🔎' : '👥') + '</span>';
+  if (isGroupChat(email)) return AV.map[email] ? '<span class="cav has all' + cls + '" data-av="' + email + '"><img src="' + AV.map[email] + '" alt=""></span>' : '<span class="cav all' + (email === 'QUALITY' ? ' q' : email === 'PROD' ? ' p' : '') + cls + '" data-av="' + email + '">' + (email === 'QUALITY' ? '🔎' : email === 'PROD' ? '⚡' : '👥') + '</span>';
   var d = AV.map[email];
   if (d) return '<span class="cav has' + cls + '" data-av="' + esc(email) + '"><img src="' + d + '" alt=""></span>';
   var p = (B().people || []).filter(function(x){ return x.email === email; })[0];
@@ -3664,13 +3745,13 @@ function startChatPoll(){
   }
   CHAT.poll = setInterval(tick, 45000); setTimeout(tick, 1500);
 }
-/* دردشتين جماعيتين: «ALL» = الإنتاج (فيها الرسايل القديمة) و«QUALITY» = الجودة — المسؤول بيشوف الاتنين */
-var GROUP_NAMES = { ALL: 'دردشة الإنتاج', QUALITY: 'دردشة الجودة' };
-function isGroupChat(id){ return id === 'ALL' || id === 'QUALITY'; }
+/* 3 دردشات جماعية: «ALL» = العامة للكل — «PROD» = الإنتاج بس — «QUALITY» = الجودة بس — والمسؤول في التلاتة */
+var GROUP_NAMES = { ALL: 'الدردشة العامة', PROD: 'دردشة الإنتاج', QUALITY: 'دردشة الجودة' };
+function isGroupChat(id){ return id === 'ALL' || id === 'PROD' || id === 'QUALITY'; }
 function myGroups(){ return (B().chatGroups && B().chatGroups.length) ? B().chatGroups : ['ALL']; }
-function groupMembers(g){ return (B().people || []).filter(function(p){ return p.owner || (g === 'QUALITY' ? p.side === 'quality' : p.side !== 'quality'); }); }
+function groupMembers(g){ return (B().people || []).filter(function(p){ return g === 'ALL' || p.owner || (g === 'QUALITY' ? p.side === 'quality' : p.side !== 'quality'); }); }
 function chatName(id){ if (isGroupChat(id)) return GROUP_NAMES[id]; var p = (B().people || []).filter(function(x){ return x.email === id; })[0]; return p ? p.name : id; }
-function chatSub(id){ if (isGroupChat(id)) return id === 'QUALITY' ? 'فريق الجودة' : 'فريق الإنتاج'; var p = (B().people || []).filter(function(x){ return x.email === id; })[0]; return p ? [p.code, p.title || p.role, p.team].filter(Boolean).join(' · ') : ''; }
+function chatSub(id){ if (isGroupChat(id)) return id === 'QUALITY' ? 'فريق الجودة' : id === 'PROD' ? 'فريق الإنتاج' : 'كل الفريق — إنتاج وجودة'; var p = (B().people || []).filter(function(x){ return x.email === id; })[0]; return p ? [p.code, p.title || p.role, p.team].filter(Boolean).join(' · ') : ''; }
 function chatTime(t){ if (!t) return ''; var d = t.slice(0, 10), hm = t.slice(11, 16); return d === today() ? hm : d.slice(5).replace('-', '/') + ' ' + hm; }
 function chatEsc(t){ return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>'); }
 VIEWS.chat = function(p){
@@ -4427,12 +4508,12 @@ function paintLive(){
       (sh.on ? '<div class="lv-bar"><i id="lvBar"></i></div>' : '') : '<div class="lv-sh"><span class="lv-shn">مفيش وردية متسجلة</span></div>') + '</div>';
   var c = d ? d.counts : null, todo = (d && d.todo) || {};
   var counts = c ? '<div class="lv-counts">' +
-    '<a class="lvc lc-att" data-go="att" title="الحاضرين دلوقتي"><i>👷</i><b>' + c.present + '<small>/' + c.total + '</small></b><span>حاضر دلوقتي</span></a>' +
+    '<a class="lvc lc-att" data-go="att" title="الحاضرين دلوقتي"><i>👷</i><b>' + c.present + '<small>/' + c.total + '</small></b><span>حاضر</span></a>' +
     '<a class="lvc lc-stop' + (c.stops ? ' hot' : '') + '" data-go="stop" title="التوقفات المفتوحة"><i>⏸️</i><b>' + c.stops + '</b><span>توقف مفتوح</span></a>' +
-    '<a class="lvc lc-urg' + (c.urgent ? ' hot' : '') + '" data-go="issue" title="المشكلات العاجلة"><i>🔥</i><b>' + c.urgent + '</b><span>مشكلة عاجلة</span></a>' +
+    '<a class="lvc lc-urg' + (c.urgent ? ' hot' : '') + '" data-go="issue" title="المشكلات العاجلة"><i>🔥</i><b>' + c.urgent + '</b><span>عاجل</span></a>' +
     '<a class="lvc lc-work" data-go="' + workView() + '" title="الشغل الجاري"><i>⚡</i><b>' + c.active + '</b><span>شغل جاري</span></a>' +
     (todo.tasks ? '<a class="lvc lc-task" data-go="tasks" title="مهامك المفتوحة"><i>📋</i><b>' + todo.tasks + '</b><span>مهمة ليك</span></a>' : '') +
-    (todo.meeting ? '<a class="lvc lc-meet" data-go="meetings" title="' + esc(todo.meeting.title) + '"><i>📅</i><b>' + esc(todo.meeting.time) + '</b><span>اجتماع النهارده</span></a>' : '') +
+    (todo.meeting ? '<a class="lvc lc-meet" data-go="meetings" title="' + esc(todo.meeting.title) + '"><i>📅</i><b>' + esc(todo.meeting.time) + '</b><span>اجتماع</span></a>' : '') +
     (todo.leave ? '<a class="lvc lc-todo" data-go="leave" title="طلبات أجازة مستنية قرارك"><i>🏖️</i><b>' + todo.leave + '</b><span>طلب أجازة</span></a>' : '') +
     (todo.summary ? '<a class="lvc lc-todo" data-go="handover" title="ملخص النهارده لسه ماتبعتش"><i>📝</i><b>!</b><span>ابعت ملخص اليوم</span></a>' : '') +
     (q ? '<button type="button" class="lvc lc-q" id="lvQueue" title="تسجيلات على الجهاز لسه ماتزامنتش"><i>⏳</i><b>' + q + '</b><span>لسه ماتزامنش</span></button>' : '') +
@@ -4794,9 +4875,9 @@ VIEWS.cars = function(){
   call('carHistory', { car: car }).then(function(h){
     var c = h.car, pct = h.pct;
     var ring = pct === null ? '<div class="ch-ring none"><b>—</b><small>مفيش خطوات</small></div>' : '<div class="ch-ring" style="--p:' + pct + '"><b>' + pct + '%</b><small>' + h.stepsDone + ' من ' + h.stepsTotal + ' خطوة</small></div>';
-    var head = '<div class="card ch-head">' + ring + '<div class="ch-info"><b class="ch-name">⁦' + esc(c.carName || c.car) + '⁩</b>' +
+    var head = '<div class="card ch-head"><div class="ch-info"><b class="ch-name ch-lbl">🚃 بيانات العربة</b>' +
       '<div class="m"><span>🚄 قطار ' + esc(c.train || '-') + '</span><span>📍 ' + esc(c.station ? stationLabel(c.station) : (c.status || '')) + '</span><span>' + xChip(c.status) + '</span></div>' +
-      '<div class="m"><span>⚡ ' + h.prod.filter(function(r){ return r.side !== 'quality'; }).length + ' سجل شغل</span><span>🔎 ' + h.prod.filter(function(r){ return r.side === 'quality'; }).length + ' سجل جودة</span><span>⏸️ ' + h.stops.length + ' توقف</span><span>⚠️ ' + h.issues.length + ' مشكلة</span><span>📦 ' + h.materials.length + ' طلب خامات</span></div></div>' + carArt(c) + '</div>';
+      '<div class="m"><span>⚡ ' + h.prod.filter(function(r){ return r.side !== 'quality'; }).length + ' سجل شغل</span><span>🔎 ' + h.prod.filter(function(r){ return r.side === 'quality'; }).length + ' سجل جودة</span><span>⏸️ ' + h.stops.length + ' توقف</span><span>⚠️ ' + h.issues.length + ' مشكلة</span><span>📦 ' + h.materials.length + ' طلب خامات</span></div></div>' + carArt(c, pct) + '</div>';
     var stations = h.stations.filter(function(s){ return s.total || s.records || s.current; });
     var st = '<div class="sec-title"><h2>خطوات الكهرباء في كل محطة</h2></div>' + (h.stepsTotal ? '' : '<div class="note">خطوات الكهرباء لسه مااتكتبتش في ورقة «خطوات الكهرباء» — أول ما تتكتب (لكل محطة ونوع عربة) النسبة هتظهر هنا لوحدها.</div>') +
       (stations.length ? '<div class="ch-stations">' + stations.map(function(s){
@@ -4818,7 +4899,7 @@ VIEWS.cars = function(){
         (photoIdsOf(e.ph).length ? '<div class="ch-ph">' + photoIdsOf(e.ph).slice(0, 4).map(function(id){ return '<button type="button" class="ch-pt" data-chph="' + esc(id) + '" data-chset="' + esc(photoIdsOf(e.ph).join(',')) + '"><span class="pload"></span></button>'; }).join('') + '</div>' : '') + '</div></div>';
     }).join('') + '</div>' : emptyHTML('مفيش أحداث للعربة دي لسه', ''));
     $('chBody').innerHTML = head + st + tl;
-    wireItems(); loadChPhotos();
+    wireItems(); loadChPhotos(); alignChRail();
     Array.prototype.forEach.call(document.querySelectorAll('#chBody [data-x]'), function(el){ el.onclick = function(){ var c2 = XCACHE[el.dataset.x]; if (c2) openXForm(c2.e, c2.r); }; });
   }).catch(function(e){ $('chBody').innerHTML = emptyHTML('مش قادر أحمّل تاريخ العربة', e.message); });
 };
@@ -5105,37 +5186,14 @@ function meetingForm(r){
   if ($('mtDel')) $('mtDel').onclick = function(){ if (!confirm('تحذف الاجتماع نهائي؟ (لو عايز تبلّغهم استخدم «إلغاء الاجتماع»)')) return; call('meetingRemove', { id: r.id }).then(function(){ closeModal(); go('meetings', {}, true); }).catch(function(e){ formMsg(e.message); }); };
 }
 
-/* ---------- رسمة العربة الكبيرة (تاريخ العربة): موشن هادي + لمعة على جسمها + انعكاس على الأرض ---------- */
-var CAR_TONE = { DTC: ['#e11d48', '#0d9488'], MC1: ['#2563eb', '#0d9488'], MC2: ['#7c3aed', '#0d9488'], MCI: ['#ea580c', '#0d9488'] };
-function carArt(c){
-  var t = c.carType || '', tone = CAR_TONE[t] || ['#0d9488', '#64748b'], cab = t === 'DTC', id = 'ca' + Math.random().toString(36).slice(2, 7);
-  var bodyD = 'M24 46 Q24 34 38 34 H' + (cab ? '470 Q506 36 512 70 L516 150 Q516 162 504 162' : '482 Q496 34 496 48 V150 Q496 162 482 162') + ' H38 Q24 162 24 150 Z';
-  var doors = [92, 196, 300, 404].map(function(x){ return '<rect x="' + x + '" y="58" width="36" height="96" rx="3" fill="url(#' + id + 'dr)" stroke="#94a3b8" stroke-width="1.2"/><line x1="' + (x + 18) + '" y1="58" x2="' + (x + 18) + '" y2="154" stroke="#94a3b8" stroke-width="1.2"/>' +
-    '<rect x="' + (x + 4) + '" y="64" width="11" height="34" rx="2" fill="url(#' + id + 'gl)"/><rect x="' + (x + 21) + '" y="64" width="11" height="34" rx="2" fill="url(#' + id + 'gl)"/>'; }).join('');
-  var wins = [40, 140, 244, 348, 448].map(function(x){ return '<rect x="' + x + '" y="64" width="' + (x === 448 && cab ? 30 : 44) + '" height="36" rx="5" fill="url(#' + id + 'gl)" stroke="#475569" stroke-width="1"/>'; }).join('');
-  var wheel = function(cx){ return '<g class="ca-wh" style="transform-origin:' + cx + 'px 176px"><circle cx="' + cx + '" cy="176" r="13" fill="#1f2937"/><circle cx="' + cx + '" cy="176" r="8" fill="#6b7280"/><path d="M' + (cx - 8) + ' 176h16M' + cx + ' 168v16" stroke="#1f2937" stroke-width="2.4"/></g>'; };
-  var w = cab ? 492 : 472;
-  var car = '<rect x="60" y="164" width="140" height="10" rx="3" fill="#334155"/><rect x="330" y="164" width="140" height="10" rx="3" fill="#334155"/>' +
-    wheel(90) + wheel(170) + wheel(360) + wheel(440) +
-    '<path d="' + bodyD + '" fill="url(#' + id + 'bd)" stroke="#94a3b8" stroke-width="1.5"/>' +
-    '<g clip-path="url(#' + id + 'cp)"><rect x="24" y="114" width="' + w + '" height="7" fill="' + tone[0] + '"/><rect x="24" y="124" width="' + w + '" height="4" fill="' + tone[1] + '"/></g>' +
-    wins + doors + (cab ? '<path d="M482 50 Q504 54 508 92 L484 94 Z" fill="url(#' + id + 'gl)"/><circle class="ca-lamp" cx="507" cy="140" r="5" fill="#fde68a"/>' : '') +
-    '<rect x="40" y="38" width="440" height="6" rx="3" fill="#94a3b8" opacity=".5"/>' +
-    '<text x="50" y="148" font-family="Cairo,Arial" font-size="17" font-weight="900" fill="#334155">' + esc(c.car) + (t ? ' · ' + esc(t) : '') + '</text>' +
-    '<g clip-path="url(#' + id + 'cp)"><rect class="ca-shine" x="-170" y="20" width="110" height="160" fill="url(#' + id + 'sh)"/></g>';
-  var svg = '<svg viewBox="0 0 530 236" class="ca-svg" aria-hidden="true" direction="ltr"><defs>' +
-    '<linearGradient id="' + id + 'bd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8fafc"/><stop offset=".55" stop-color="#e2e8f0"/><stop offset="1" stop-color="#cbd5e1"/></linearGradient>' +
-    '<linearGradient id="' + id + 'gl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0f172a"/><stop offset=".55" stop-color="#1e3a5f"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>' +
-    '<linearGradient id="' + id + 'dr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2e8f0"/><stop offset="1" stop-color="#cbd5e1"/></linearGradient>' +
-    '<linearGradient id="' + id + 'sh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
-    '<linearGradient id="' + id + 'rf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
-    '<clipPath id="' + id + 'cp"><path d="' + bodyD + '"/></clipPath>' +
-    '<mask id="' + id + 'mk" maskUnits="userSpaceOnUse" x="0" y="192" width="530" height="44"><rect x="0" y="192" width="530" height="44" fill="url(#' + id + 'rf)"/></mask></defs>' +
-    '<ellipse cx="265" cy="194" rx="240" ry="6" fill="#0f172a" opacity=".12"/>' +
-    '<g class="ca-car">' + car + '</g>' +
-    '<g mask="url(#' + id + 'mk)"><g transform="translate(0 384) scale(1 -1)"><g class="ca-car">' + car + '</g></g></g>' +
-    '<rect x="10" y="191" width="510" height="2.5" rx="1.2" fill="#94a3b8" opacity=".6"/></svg>';
-  return '<div class="ch-art">' + svg + '<div class="ch-art-l"><span class="chip" style="background:' + tone[0] + '22;color:' + tone[0] + '">' + esc(t || 'عربة') + '</span>' + (c.unit ? '<span class="chip">' + esc(c.unit) + '</span>' : '') + (c.train ? '<span class="chip">قطر ' + esc(c.train) + '</span>' : '') + '</div></div>';
+/* ---------- رسمة العربة الكبيرة (تاريخ العربة): نفس رسمة لوحة الخطوط بتفاصيل أكتر، واقفة على القضبان ---------- */
+function carArt(c, pct){
+  ensureCarDefs();
+  var t = String(c.carType || '').toUpperCase(), onLine = c.status !== 'خرجت من الخط' && !!c.station;
+  var name = c.carName || c.car;
+  return '<div class="ch-art"><div class="stage3d ch-stage"><div class="track3d"><i class="sl"></i><i class="rl a"></i><i class="rl b"></i><i class="gl"></i></div>' +
+    '<div class="car3d ch-car">' + carSVG(t, false, c.station === '#19', true) + '<i class="shadow"></i></div></div>' +
+    '<div class="ch-cname">' + (onLine && pct !== null && pct !== undefined ? ringSVG(pct, 64, 'اكتمال') : '') + '<div><b>\u2066' + esc(name) + '\u2069</b><small>' + (onLine ? '📍 ' + esc(stationLabel(c.station)) : esc(c.status || '')) + '</small></div></div></div>';
 }
 function loadChPhotos(){
   var els = Array.prototype.slice.call(document.querySelectorAll('[data-chph]'));
@@ -5275,6 +5333,21 @@ VIEWS.tech = function(){
     document.querySelectorAll('[data-skedit]').forEach(function(el){ el.onclick = function(){ var row = r.skillRows.filter(function(x){ return x.skill === el.dataset.skedit; })[0] || {}; skillForm({ email: P.email, name: P.name, code: P.code }, el.dataset.skedit, row); }; });
   }).catch(function(e){ $('tpBody').innerHTML = emptyHTML('مش قادر أحمّل صفحة الفني', e.message); });
 };
+
+/* العجل يقف على القضيب بالظبط: بنقيس أسفل العجل وأعلى القضيب القريب ونظبط مكان العربة */
+function alignChRail(){
+  var fix = function(){
+    var st = document.querySelector('.ch-stage'); if (!st) return;
+    var car = st.querySelector('.car3d'), rail = st.querySelector('.rl.b'); if (!car || !rail) return;
+    var wb = 0; car.querySelectorAll('.wh circle:first-child').forEach(function(c){ wb = Math.max(wb, c.getBoundingClientRect().bottom); });
+    if (!wb) return;
+    var rt = rail.getBoundingClientRect(), target = rt.top + rt.height * .45;
+    var cur = parseFloat(getComputedStyle(car).bottom) || 0;
+    car.style.bottom = (cur + (wb - target)) + 'px';
+  };
+  [60, 120, 1300, 1380, 1460].forEach(function(t){ setTimeout(fix, t); });
+  if (!window.__chRailRs){ window.__chRailRs = 1; window.addEventListener('resize', function(){ clearTimeout(window.__chRailT); window.__chRailT = setTimeout(fix, 150); }); }
+}
 </script>
 <script>
 /* تطبيق الموبايل: لو رابط السيرفر مش متحط في config.js */
@@ -5302,7 +5375,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611130036').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611130253').catch(function(){}); });
 </script>
 </body>
 </html>
