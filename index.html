@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611130309"></script>
+<script src="config.js?v=202611130338"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1857,6 +1857,10 @@ function roleChips(p, extra){
 function isMgr(){ return role() === 'مدير' || role() === 'مشرف'; }
 function isOwner(){ return !!(S.boot && S.boot.isOwner); }
 function isQM(){ return !!(S.boot && S.boot.isQM); }
+/** المهندس: نفس صلاحيات المشرف — وبيشوف إدارته كلها (حضور / مهام / تقييمات / مهارات) عرض بس */
+function isEng(){ return !!(S.boot && S.boot.isEng) && !isOwner(); }
+/** المشرف / المهندس: بيشوفوا حضور غيرهم (من غير تعديل) */
+function attSeeList(){ var ok = {}; (B().attSee || []).forEach(function(e){ ok[e] = 1; }); return (B().people || []).filter(function(x){ return ok[x.email]; }); }
 /** الشخص ده من فريق الجودة؟ */
 function isQSide(){ return !!(S.boot && S.boot.side === 'quality'); }
 /** صفحة الشغل بتاعتي: «الإنتاج» أو «الجودة» */
@@ -2097,8 +2101,8 @@ var XLSX_MINI = (function(){
 })();
 
 /** تنزيل جدول Excel منسق (للمدير بس) */
-function downloadCSV(name, headers, rows, fileBase){
-  if (!isAdmin()){ toast('تنزيل البيانات للمدير بس.', 'err'); return; }
+function downloadCSV(name, headers, rows, fileBase, allow){
+  if (!isAdmin() && !allow){ toast('تنزيل البيانات للمدير بس.', 'err'); return; }
   name = String(name || 'بيانات').replace(/[\\/:*?"<>|]/g, '-');
   try {
     var data = XLSX_MINI.build(name.slice(0, 31), headers, rows);
@@ -2129,7 +2133,7 @@ function techPickOptions(){
   });
 }
 function peopleOptions(filter){ return (B().people || []).filter(filter || function(){ return true; }).map(function(p){ return { v: p.name, t: p.name + (p.code ? ' (' + p.code + ')' : '') }; }); }
-function techOptionsByEmail(){ var qm = !isOwner() && isQM(); return (B().people || []).filter(function(p){ return qm ? (p.isQ || p.email === B().me.email) : (p.role === 'فني' || p.role === 'مشرف'); }).map(function(p){ return { v: p.email, t: p.name + (p.code ? ' (' + p.code + ')' : '') + (p.team ? ' — ' + p.team : '') }; }); }
+function techOptionsByEmail(){ var qm = !isOwner() && isQM(); if (isEng() && !qm) return [{ v: B().me.email, t: B().me.name + (B().me.code ? ' (' + B().me.code + ')' : '') }]; return (B().people || []).filter(function(p){ return qm ? (p.isQ || p.email === B().me.email) : (p.role === 'فني' || p.role === 'مشرف'); }).map(function(p){ return { v: p.email, t: p.name + (p.code ? ' (' + p.code + ')' : '') + (p.team ? ' — ' + p.team : '') }; }); }
 /* ---------- اسم العربة: C16 - MCI - U4 (رقم العربة شمال، النوع في النص، الوحدة يمين) ---------- */
 function normCarNo(v){ v = String(v == null ? '' : v).replace(/\s+/g, '').toUpperCase().replace(/[٠-٩]/g, function(d){ return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); }); return /^\d+$/.test(v) ? 'C' + v : v; }
 function normUnit(v){ v = String(v == null ? '' : v).replace(/\s+/g, '').toUpperCase().replace(/[٠-٩]/g, function(d){ return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); }); return /^\d+$/.test(v) ? 'U' + v : v; }
@@ -2204,7 +2208,7 @@ function FORMS(){
       { k:'toDate', t:'إلى تاريخ', type:'hidden' },
       { k:'in', t:'وقت الدخول', type:'time' },
       { k:'out', t:'وقت الانصراف', type:'time' },
-      { k:'approval', t:'الاعتماد', type:'select', options: opts(st.approval), def:'معتمد' },
+      { k:'approval', t:'الاعتماد', type: isEng() && !isQM() ? 'hidden' : 'select', options: opts(st.approval), def:'معتمد' },
       { k:'notes', t:'الملاحظات', type:'textarea', full:1 }
     ]}
   };
@@ -2752,14 +2756,21 @@ function attItem(r){
     (r.late ? '<span>تأخير ' + esc(r.late) + ' د</span>' : '') + (r.early ? '<span>انصراف مبكر ' + esc(r.early) + ' د</span>' : '') +
     (r.hours ? '<span>' + esc(r.hours) + ' ساعة</span>' : '') + '<span>' + esc(r.source || '') + '</span></div>' +
     (r.updatedBy && r.createdBy && r.updatedBy !== r.createdBy ? '<div class="m"><span>✎ اتعدّل بواسطة ' + esc(personName(r.updatedBy)) + ' — ' + esc(r.updatedAt || '') + '</span></div>' : '') +
-    (canApprove(r) ? '<div class="acts">' + (r.approval === 'بانتظار الاعتماد' ? '<button class="btn sm green" data-appr="'+esc(r.id)+'" data-d="معتمد">اعتماد</button><button class="btn sm danger" data-appr="'+esc(r.id)+'" data-d="مرفوض">رفض</button>' : '') +
+    (canApprove(r) || canManageAtt(r) ? '<div class="acts">' + (canApprove(r) && r.approval === 'بانتظار الاعتماد' ? '<button class="btn sm green" data-appr="'+esc(r.id)+'" data-d="معتمد">اعتماد</button><button class="btn sm danger" data-appr="'+esc(r.id)+'" data-d="مرفوض">رفض</button>' : '') +
       (canManageAtt(r) ? '<button class="btn sm" data-attedit="'+esc(r.id)+'">✎ تعديل الوقت / البيانات</button>' : '') + '</div>' : '') + '</div>';
 }
 /** المسؤول يعتمد الكل — مشرف الجودة يعتمد فنيين الجودة بس */
-function canApprove(r){ return canManageAtt(r); }
-/** المسؤول للكل — مشرف الجودة لنفسه ولفنيين الجودة (تسجيل وتعديل واعتماد) */
+function canApprove(r){
+  if (isOwner()) return true;
+  if (!isQM() || !r) return false;
+  if (r.email && r.email === B().me.email) return true;
+  var p = (B().people || []).filter(function(x){ return x.email === r.email; })[0];
+  return !!(p && p.isQ);
+}
+/** المسؤول للكل — مشرف الجودة لنفسه ولفنيين الجودة — المهندس لنفسه بس (تسجيل وتعديل) */
 function canManageAtt(r){
   if (isOwner()) return true;
+  if (isEng() && r && r.email === B().me.email) return true;
   if (!isQM() || !r) return false;
   if (r.email && r.email === B().me.email) return true;
   var p = (B().people || []).filter(function(x){ return x.email === r.email; })[0];
@@ -2859,19 +2870,22 @@ VIEWS.issue = function(){ listView('issue', { title:'المشكلات', sub:'م�
 
 /* ---------- الحضور ---------- */
 VIEWS.att = function(){
-  var v = $('view'), p = S.params, own = isOwner(), qm = !own && isQM();
+  var v = $('view'), p = S.params, own = isOwner(), qm = !own && isQM(), eng = !own && isEng(), team = !own && !qm && isMgr();
   var mode = p.mode === 'month' ? 'month' : 'day';
   var day = p.day || today();
   var month = p.month || today().slice(0, 7);
-  var who = (own || qm) ? (p.email || '') : B().me.email;
+  var who = (own || qm || team) ? (p.email || '') : B().me.email;
   var from, to, label;
   if (mode === 'month'){
     var mp = month.split('-'); var last = new Date(+mp[0], +mp[1], 0).getDate();
     from = month + '-01'; to = month + '-' + p2(last); label = 'شهر ' + month;
   } else { from = to = day; label = day === today() ? 'النهارده' : 'يوم ' + day; }
-  var techs = (B().people || []).filter(function(x){ return x.role !== 'مشاهد' && (!qm || x.isQ || x.email === B().me.email); });
-  v.innerHTML = '<div class="row"><div><h1 class="page">الحضور</h1><p class="sub">' + (own ? 'حضور الفريق كله — اختار يوم أو شهر، وفني معين أو الكل' : qm ? 'حضورك وحضور فنيين الجودة — اختار يوم أو شهر، وفني معين أو الكل' : 'حضورك وانصرافك انت بس — أي يوم أو أي شهر فات') + '</p></div><span class="sp"></span>' +
-    ((own || qm) ? '<button class="btn primary" id="addAtt">+ تسجيل لفني</button>' : '') + '</div>' +
+  var techs = team ? attSeeList() : (B().people || []).filter(function(x){ return x.role !== 'مشاهد' && (!qm || x.isQ || x.email === B().me.email); });
+  var allLbl = qm ? 'الكل (فنيين الجودة)' : eng ? 'الكل (' + (B().side === 'quality' ? 'إدارة الجودة' : 'إدارة الإنتاج') + ')' : team ? 'الكل (فريقك)' : 'الكل';
+  v.innerHTML = '<div class="row"><div><h1 class="page">الحضور</h1><p class="sub">' + (own ? 'حضور الفريق كله — اختار يوم أو شهر، وفني معين أو الكل' : qm ? 'حضورك وحضور فنيين الجودة — اختار يوم أو شهر، وفني معين أو الكل' :
+      eng ? 'حضور كل ' + (B().side === 'quality' ? 'إدارة الجودة' : 'إدارة الإنتاج') + ' (عرض بس) — وحضورك انت تقدر تعدّله أو تسجل أيام فاتت' :
+      team ? 'حضور فريقك كله (عرض بس) — التعديل للمسؤول' : 'حضورك وانصرافك انت بس — أي يوم أو أي شهر فات') + '</p></div><span class="sp"></span>' +
+    ((own || qm) ? '<button class="btn primary" id="addAtt">+ تسجيل لفني</button>' : eng ? '<button class="btn primary" id="addAtt">+ سجّل يوم ليا</button>' : '') + '</div>' +
     (function(){ var pp = who ? ((B().people || []).filter(function(x){ return x.email === who; })[0] || (who === B().me.email ? B().me : null)) : null;
       return pp ? '<div class="attwho">' + avatarHTML(pp.email, 'sm') + '<div><b>' + esc(pp.name) + (pp.code ? ' <span class="sub">(' + esc(pp.code) + ')</span>' : '') + '</b>' + roleChips(pp) + '</div></div>' : ''; })() +
     '<div id="myatt2"></div>' +
@@ -2879,10 +2893,10 @@ VIEWS.att = function(){
       '<div class="f">العرض<select id="aMode"><option value="day"' + (mode === 'day' ? ' selected' : '') + '>يوم</option><option value="month"' + (mode === 'month' ? ' selected' : '') + '>شهر كامل</option></select></div>' +
       '<div class="f' + (mode === 'day' ? '' : ' hidden') + '" id="aDayW">اليوم<input type="date" id="aDay" value="' + day + '" max="' + today() + '"></div>' +
       '<div class="f' + (mode === 'month' ? '' : ' hidden') + '" id="aMonW">الشهر<input type="month" id="aMon" value="' + month + '" max="' + today().slice(0, 7) + '"></div>' +
-      ((own || qm) ? '<div class="f">الفني<select id="aWho"><option value="">' + (qm ? 'الكل (فنيين الجودة)' : 'الكل') + '</option>' + techs.map(function(x){ return '<option value="' + esc(x.email) + '"' + (x.email === who ? ' selected' : '') + '>' + esc(x.name + (x.code ? ' (' + x.code + ')' : '')) + '</option>'; }).join('') + '</select></div>' : '') +
+      ((own || qm || team) ? '<div class="f">الفني<select id="aWho"><option value="">' + allLbl + '</option>' + techs.map(function(x){ return '<option value="' + esc(x.email) + '"' + (x.email === who ? ' selected' : '') + '>' + esc(x.name + (x.code ? ' (' + x.code + ')' : '')) + '</option>'; }).join('') + '</select></div>' : '') +
       '<button class="btn" id="aGo">عرض</button>' + (isAdmin() ? '<button class="btn" id="aCsv">تنزيل Excel</button>' : '') +
     '</div><div id="attBody">' + loadingHTML() + '</div>';
-  if ($('addAtt')) $('addAtt').onclick = function(){ openForm('att', { date: mode === 'day' ? day : today(), email: who }); };
+  if ($('addAtt')) $('addAtt').onclick = function(){ openForm('att', { date: mode === 'day' ? day : today(), email: eng ? B().me.email : who }); };
   $('aMode').onchange = function(){ $('aDayW').classList.toggle('hidden', this.value !== 'day'); $('aMonW').classList.toggle('hidden', this.value !== 'month'); };
   $('aGo').onclick = function(){
     go('att', { mode: $('aMode').value, day: $('aDay').value || today(), month: $('aMon').value || today().slice(0, 7), email: $('aWho') ? $('aWho').value : '' });
@@ -2896,7 +2910,7 @@ VIEWS.att = function(){
     var sum = { 'حاضر':0,'متأخر':0,'غائب':0,'أجازة':0,'إذن / مأمورية':0 }, lvT = {}, late = 0, early = 0, hours = 0, otMin = 0, otDays = 0;
     rows.forEach(function(r){ sum[r.status] = (sum[r.status]||0) + 1; if (r.status === 'أجازة') lvT[r.leaveType || 'غير محدد'] = (lvT[r.leaveType || 'غير محدد'] || 0) + 1; late += Number(r.late)||0; early += Number(r.early)||0; hours += Number(r.hours)||0;
       if (Number(r.overtime) > 0){ otMin += Number(r.overtime); otDays++; } });
-    var whoName = (own || qm) ? (who ? (techs.filter(function(x){ return x.email === who; })[0] || {}).name || who : (qm ? 'فنيين الجودة' : 'الكل')) : B().me.name;
+    var whoName = (own || qm || team) ? (who ? (techs.filter(function(x){ return x.email === who; })[0] || {}).name || who : allLbl.replace(/^الكل \((.*)\)$/, '$1')) : B().me.name;
     var h = '<div class="card" style="margin-bottom:12px"><div class="row" style="margin-bottom:8px"><b>' + esc(label) + ' — ' + esc(whoName) + '</b><span class="sp"></span><span class="chip">' + rows.length + ' تسجيل</span></div>' +
       '<div class="row">' + ['حاضر','متأخر','غائب','أجازة','إذن / مأمورية'].map(function(k){ return statusChip(k).replace('</span>', '<span class="cnt">&nbsp;:&nbsp;' + (sum[k]||0) + '</span></span>'); }).join(' ') + '</div>' +
       (sum['أجازة'] ? '<div class="row lvbreak"><span class="sub" style="margin:0">الأجازات:</span> ' + Object.keys(lvT).map(function(k){ return leaveChip(k).replace('</span>', ' : ' + lvT[k] + '</span>'); }).join(' ') + '</div>' : '') +
@@ -4624,7 +4638,7 @@ var XFORM_STOPS = [];
 function XFORMS(){
   var x = XS(), L = B().lists || {};
   return {
-    material: { title: 'طلب خامات / قطع غيار', fields: [
+    material: { title: 'طلب خامات', fields: [
       { k:'item', t:'الصنف المطلوب', type:'text', req:1, full:1 },
       { k:'qty', t:'الكمية', type:'number' },
       { k:'uom', t:'الوحدة', type:'text', list:'uomList', hint:'متر، قطعة، لفة ...' },
@@ -4744,7 +4758,7 @@ function xListView(entity, cfg){
   }).catch(function(e){ $('lst').innerHTML = emptyHTML('مش قادر أحمّل السجلات', e.message); });
 }
 
-/* ---------- 3) الخامات وقطع الغيار ---------- */
+/* ---------- 3) الخامات ---------- */
 function materialItem(r){
   var open = r.status !== 'وصل' && r.status !== 'اتلغى', late = open && r.eta && r.eta < today();
   var nx = { 'جديد': 'تم الطلب', 'تم الطلب': 'وصل', 'وصل جزئي': 'وصل' }[r.status];
@@ -4755,7 +4769,7 @@ function materialItem(r){
     (open && isMgr() && nx ? '<div class="acts"><button class="btn sm" data-xst="' + esc(r.id) + '" data-to="' + nx + '">' + (nx === 'وصل' ? '✅ وصل' : '🛒 اتطلب') + '</button></div>' : '') + '</div>';
 }
 VIEWS.material = function(){
-  xListView('material', { icon: '📦', title: 'الخامات وقطع الغيار', sub: 'طلبات الخامات من الموقع ومتابعتها لحد ما توصل — ومربوطة بالتوقفات', add: 'طلب خامات', statuses: XS().material || [], item: materialItem,
+  xListView('material', { icon: '📦', title: 'الخامات', sub: 'طلبات الخامات من الموقع ومتابعتها لحد ما توصل — ومربوطة بالتوقفات', add: 'طلب خامات', statuses: XS().material || [], item: materialItem,
     top: function(rows){ var u = rows.filter(function(r){ return r.urgency === 'عاجل' && r.status !== 'وصل' && r.status !== 'اتلغى'; }).length, l = rows.filter(function(r){ return r.status !== 'وصل' && r.status !== 'اتلغى' && r.eta && r.eta < today(); }).length;
       return (u || l) ? '<div class="row" style="margin-bottom:8px">' + (u ? '<span class="chip c-red">عاجل مستني: ' + u + '</span>' : '') + (l ? '<span class="chip c-amber">اتأخر عن ميعاده: ' + l + '</span>' : '') + '</div>' : ''; } });
 };
@@ -4825,7 +4839,7 @@ function leaveDecideUI(r, dec){
 VIEWS.handover = function(){
   var v = $('view'), day = S.params.day || today();
   if (!isMgr()){ v.innerHTML = emptyHTML('ملخص اليوم للمشرفين', ''); return; }
-  v.innerHTML = '<div class="row"><div><h1 class="page">📝 ملخص اليوم</h1><p class="sub">كل اللي حصل في اليوم — بيتحسب لوحده من السجلات، وبيتبعت للمهندس المسؤول إشعار وإيميل (ولو محدش بعته بيتبعت لوحده آخر اليوم)</p></div></div>' +
+  v.innerHTML = '<div class="row"><div><h1 class="page">📝 ملخص اليوم</h1><p class="sub">' + (isEng() ? 'كل اللي حصل في اليوم — بيتحسب لوحده من السجلات، والمشرف بيبعته لك إشعار وإيميل (ولو محدش بعته بيتبعت لوحده آخر اليوم)' : 'كل اللي حصل في اليوم — بيتحسب لوحده من السجلات، وبيتبعت للمهندس المسؤول إشعار وإيميل (ولو محدش بعته بيتبعت لوحده آخر اليوم)') + '</p></div></div>' +
     '<div class="filters"><div class="f">اليوم<input type="date" id="dsDay" value="' + day + '"></div><button class="btn" id="dsPrev">◀ اليوم اللي قبله</button><button class="btn" id="dsToday">النهارده</button></div>' +
     '<div id="dsBody">' + loadingHTML('بحسب ملخص اليوم...') + '</div><div class="sec-title"><h2>الملخصات اللي اتبعتت</h2></div><div id="dsList">' + loadingHTML() + '</div>';
   var again = function(d){ go('handover', { day: d }, true); };
@@ -4849,10 +4863,12 @@ VIEWS.handover = function(){
       sec('📋', 'المهام', l.tasks.map(function(r){ return li((r.status === 'اتنفذت' ? '✅ ' : '⏳ ') + esc(r.title), esc(r.who + ' — ' + r.status)); })) +
       sec('⛑️', 'السلامة', l.safety.map(function(r){ return li(esc(r.kind), esc(r.severity + (r.station ? ' — ' + r.station : ''))); })) + '</div>' +
       '<div class="card ds-send"><div class="form"><div class="fld full"><label for="dsPend">المطلوب بكرة (اتكتب لوحده من الشغل المفتوح — عدّل براحتك)</label><textarea id="dsPend" rows="6">' + esc(x.sent ? x.sent.pendingItems : x.pendingItems) + '</textarea></div>' +
+      (isEng() ? '</div>' + (x.sent && x.sent.notes ? '<div class="note" style="margin-top:8px">🗒 ملاحظات المشرف: ' + esc(x.sent.notes) + '</div>' : '') + '</div>' :
       '<div class="fld full"><label for="dsNotes">ملاحظاتك للمهندس</label><textarea id="dsNotes" placeholder="أي حاجة مهمة حصلت النهارده">' + esc(x.sent ? x.sent.notes : '') + '</textarea></div></div>' +
-      '<div id="fmsg"></div><div class="row" style="margin-top:10px"><button class="btn primary" id="dsSend">📤 ' + (x.sent ? 'ابعته تاني (تحديث)' : 'ابعت الملخص للمهندس المسؤول') + '</button><span class="sub" style="margin:0">هيوصل إشعار وإيميل لـ: <b>' + x.to.map(esc).join('، ') + '</b></span></div></div>';
+      '<div id="fmsg"></div><div class="row" style="margin-top:10px"><button class="btn primary" id="dsSend">📤 ' + (x.sent ? 'ابعته تاني (تحديث)' : 'ابعت الملخص للمهندس المسؤول') + '</button><span class="sub" style="margin:0">هيوصل إشعار وإيميل لـ: <b>' + x.to.map(esc).join('، ') + '</b></span></div></div>');
     $('dsBody').innerHTML = h; animateCounts($('dsBody'));
-    $('dsSend').onclick = function(){
+    if ($('dsPend') && isEng()) $('dsPend').readOnly = true;
+    if ($('dsSend')) $('dsSend').onclick = function(){
       var b = this; b.disabled = true; b.textContent = 'جاري الإرسال...';
       call('daySummarySend', { date: day, pendingItems: $('dsPend').value, notes: $('dsNotes').value }).then(function(r){ toast('ملخص اليوم اتبعت ✅ (' + r.mail + ' إيميل)', 'ok'); go('handover', { day: day }, true); liveTick(); })
         .catch(function(e){ b.disabled = false; b.textContent = '📤 ابعت الملخص'; $('fmsg').innerHTML = '<div class="form-msg err">' + esc(e.message) + '</div>'; });
@@ -4916,11 +4932,13 @@ document.addEventListener('click', function(ev){
 /* ---------- 8) مصفوفة المهارات ---------- */
 var SKILL_LV = ['—', 'بيتعلم', 'بإشراف', 'مستقل', 'خبير وبيدرّب'];
 VIEWS.skills = function(){
-  var v = $('view'), mgr = isMgr();
-  v.innerHTML = '<div class="row"><div><h1 class="page">🎓 مصفوفة المهارات</h1><p class="sub">' + (mgr ? 'مستوى كل فني في كل مهارة + التدريبات والشهادات — دوس على أي خانة علشان تعدّلها' : 'مستواك في كل مهارة والتدريبات والشهادات') + '</p></div></div>' +
+  var v = $('view'), see = isMgr(), mgr = see && !isEng();
+  v.innerHTML = '<div class="row"><div><h1 class="page">🎓 مصفوفة المهارات</h1><p class="sub">' + (mgr ? 'مستوى كل فني في كل مهارة + التدريبات والشهادات — دوس على أي خانة علشان تعدّلها' : see ? 'مستوى كل واحد في ' + (B().side === 'quality' ? 'إدارة الجودة' : 'إدارة الإنتاج') + ' في كل مهارة (عرض بس)' : 'مستواك في كل مهارة والتدريبات والشهادات') + '</p></div><span class="sp"></span>' +
+    (see ? '<button class="btn hidden" id="skCsv">⬇️ ملف المهارات</button>' : '') + '</div>' +
     '<div class="sk-legend">' + SKILL_LV.slice(1).map(function(t, i){ return '<span class="skl l' + (i + 1) + '">' + skDots(i + 1) + ' ' + t + '</span>'; }).join('') + '</div><div id="skBody">' + loadingHTML() + '</div>';
   call('xList', { entity: 'skills' }).then(function(res){
     var map = {}; res.rows.forEach(function(r){ map[r.email + '|' + r.skill] = r; });
+    if ('canEdit' in res) mgr = !!res.canEdit;
     var people = res.people.sort(function(a, b){ return a.name.localeCompare(b.name, 'ar'); }), skills = res.skills;
     if (!skills.length){ $('skBody').innerHTML = emptyHTML('مفيش مهارات', 'اكتب المهارات في الإعدادات (SKILLS) مفصولة بفاصلة.'); return; }
     var soon = addDays(today(), 30);
@@ -4936,6 +4954,11 @@ VIEWS.skills = function(){
       }).join('') + '</tbody></table></div>' +
       '<div class="sub" style="margin-top:10px">📜 = عنده شهادة — ⚠️ = الشهادة هتخلص خلال 30 يوم أو خلصت. المهارات نفسها بتتعدل من الإعدادات (SKILLS).</div>';
     $('skBody').innerHTML = h;
+    if ($('skCsv')){ $('skCsv').classList.remove('hidden'); $('skCsv').onclick = function(){
+      downloadCSV('مصفوفة المهارات', ['الكود','الاسم','الفريق'].concat(skills).concat(['المستقل فأعلى']), people.map(function(p){
+        var n = 0; return [p.code, p.name, p.team].concat(skills.map(function(s){ var r = map[p.email + '|' + s], l = r && r.level !== '' ? +r.level : 0; if (l >= 3) n++; return (l ? l + ' - ' + SKILL_LV[l] : '—') + (r && r.certificate ? ' 📜 ' + r.certificate + (r.certExpiry ? ' (لحد ' + r.certExpiry + ')' : '') : ''); })).concat([n + '/' + skills.length]);
+      }), 'NERIC-Skills_' + today(), true);
+    }; }
     Array.prototype.forEach.call(document.querySelectorAll('[data-sk]'), function(b){ b.onclick = function(){
       var k = b.dataset.sk.split('|'), p = people.filter(function(x){ return x.email === k[0]; })[0];
       skillForm(p, k[1], map[b.dataset.sk] || {});
@@ -5045,11 +5068,11 @@ function taskCard(r, showWho){
     (me && open ? '<div class="acts">' + (r.status === 'جديدة' ? '<button class="btn sm" data-tkgo="' + esc(r.id) + '">▶️ بدأت فيها</button>' : '') + '<button class="btn sm primary" data-tkdone="' + esc(r.id) + '">✅ خلصتها</button></div>' : '') + '</div>';
 }
 VIEWS.tasks = function(){
-  var v = $('view'), p = S.params, day = p.day || today(), mgr = isMgr(), mine = !mgr || p.mine === true;
-  v.innerHTML = '<div class="row"><div><h1 class="page">📋 المهام اليومية</h1><p class="sub">' + (mgr ? 'اسند مهمة لأي حد في فريقك — بيوصله إشعار على الموبايل وإيميل، ولما يخلصها بيوصلك إشعار وإيميل' : 'المهام اللي اتسندت لك — لما تخلص أي مهمة دوس «خلصتها» وهيوصل للمسؤول إشعار وإيميل') + '</p></div><span class="sp"></span>' +
+  var v = $('view'), p = S.params, day = p.day || today(), eng = isEng(), see = isMgr(), mgr = see && !eng, mine = !see || p.mine === true;
+  v.innerHTML = '<div class="row"><div><h1 class="page">📋 المهام اليومية</h1><p class="sub">' + (eng ? 'كل المهام اللي متوزعة على ' + (B().side === 'quality' ? 'إدارة الجودة' : 'إدارة الإنتاج') + ' بتفاصيلها (عرض بس) — دوس على أي مهمة تشوفها كاملة' : mgr ? 'اسند مهمة لأي حد في فريقك — بيوصله إشعار على الموبايل وإيميل، ولما يخلصها بيوصلك إشعار وإيميل' : 'المهام اللي اتسندت لك — لما تخلص أي مهمة دوس «خلصتها» وهيوصل للمسؤول إشعار وإيميل') + '</p></div><span class="sp"></span>' +
     (mgr ? '<button class="btn primary" id="tkNew">+ مهمة جديدة</button>' : '') + '</div>' +
     '<div class="filters"><div class="f">اليوم<input type="date" id="tkDay" value="' + day + '"></div><button class="btn" id="tkPrev">◀ امبارح</button><button class="btn" id="tkToday">النهارده</button><button class="btn" id="tkNext">بكرة ▶</button>' +
-    (mgr ? '<label class="f" style="flex-direction:row;align-items:center;gap:6px;padding-bottom:8px"><input type="checkbox" id="tkMine"' + (p.mine ? ' checked' : '') + '>مهامي أنا بس</label>' : '') + '</div><div id="tkBody">' + loadingHTML() + '</div>';
+    (see ? '<label class="f" style="flex-direction:row;align-items:center;gap:6px;padding-bottom:8px"><input type="checkbox" id="tkMine"' + (p.mine ? ' checked' : '') + '>مهامي أنا بس</label>' : '') + '</div><div id="tkBody">' + loadingHTML() + '</div>';
   var again = function(d){ go('tasks', { day: d, mine: $('tkMine') ? $('tkMine').checked : false }, true); };
   $('tkDay').onchange = function(){ again(this.value); };
   $('tkPrev').onclick = function(){ again(addDays(day, -1)); }; $('tkNext').onclick = function(){ again(addDays(day, 1)); }; $('tkToday').onclick = function(){ again(today()); };
@@ -5061,7 +5084,7 @@ VIEWS.tasks = function(){
     var done = rows.filter(function(r){ return r.status === 'اتنفذت'; }).length, live = rows.filter(function(r){ return r.status !== 'اتلغت'; }).length, late = rows.filter(taskLate).length;
     h += '<div class="tk-sum"><div><b>' + done + '</b><small>/' + live + '</small><span>اتنفذت</span></div><div class="' + (late ? 'bad' : '') + '"><b>' + late + '</b><span>متأخرة</span></div><div><b>' + rows.filter(function(r){ return r.status === 'قيد التنفيذ'; }).length + '</b><span>قيد التنفيذ</span></div>' +
       '<div class="tk-bar"><i style="width:' + (live ? Math.round(done / live * 100) : 0) + '%"></i></div></div>';
-    if (!rows.length) h += emptyHTML('مفيش مهام في اليوم ده', mgr ? 'دوس «+ مهمة جديدة» وأسندها لأي حد في فريقك.' : 'لما المشرف يسند لك مهمة هيوصلك إشعار وإيميل.');
+    if (!rows.length) h += emptyHTML('مفيش مهام في اليوم ده', eng ? 'لما المشرفين يسندوا مهام هتظهر هنا.' : mgr ? 'دوس «+ مهمة جديدة» وأسندها لأي حد في فريقك.' : 'لما المشرف يسند لك مهمة هيوصلك إشعار وإيميل.');
     else if (mine) h += '<div class="list">' + rows.map(function(r){ return taskCard(r, false); }).join('') + '</div>';
     else {
       var by = {}; rows.forEach(function(r){ (by[r.assigneeEmail] = by[r.assigneeEmail] || []).push(r); });
@@ -5095,7 +5118,7 @@ function taskDoneForm(r){
   };
 }
 function taskForm(r){
-  r = r || {}; var isNew = !r.id, mgr = isMgr(), boss = isOwner() || r.createdBy === B().me.email || (mgr && !isNew);
+  r = r || {}; var isNew = !r.id, mgr = isMgr() && !isEng(), boss = isOwner() || (mgr && (r.createdBy === B().me.email || !isNew));
   if (!isNew && !boss){
     openModal('📋 ' + r.title, taskCard(r, true), '<button class="btn" id="fcancel">إغلاق</button>'); $('fcancel').onclick = closeModal; return;
   }
@@ -5246,7 +5269,8 @@ VIEWS.techs = function(){
   v.innerHTML = '<div class="row"><div><h1 class="page">👷 الفنيين</h1><p class="sub">كل فني في نظرة واحدة: التقييم والحضور والمهارات والمهام — دوس على أي فني تشوف صفحته بالتفصيل</p></div></div>' +
     '<div class="filters">' + monthPick('tcM', mb.from) + '<div class="f">بحث<input id="tcQ" type="search" placeholder="اسم أو كود" value="' + esc(p.q || '') + '"></div>' +
     '<div class="f">الفريق<select id="tcT"><option value="">الكل</option></select></div>' +
-    '<div class="f">الترتيب<select id="tcS"><option value="name">الاسم</option><option value="score">التقييم</option><option value="skill">المهارات</option><option value="attend">الحضور</option></select></div></div>' +
+    '<div class="f">الترتيب<select id="tcS"><option value="name">الاسم</option><option value="score">التقييم</option><option value="skill">المهارات</option><option value="attend">الحضور</option></select></div>' +
+    '<button class="btn hidden" id="tcEvCsv">⬇️ ملف التقييمات</button><button class="btn hidden" id="tcSkCsv">⬇️ ملف المهارات</button></div>' +
     '<div id="tcBody">' + loadingHTML('بجهّز داشبورد الفنيين...') + '</div>';
   $('tcM').onchange = function(){ go('techs', { month: this.value }, true); };
   call('techs', { from: mb.from, to: mb.to }).then(function(r){
@@ -5290,10 +5314,27 @@ VIEWS.techs = function(){
     };
     $('tcBody').innerHTML = hero + map + '<div class="sec-title"><h2>الفريق <span class="chip">' + N + '</span></h2><span class="sub" style="margin:0">التقييم مقترح من البيانات المسجلة — مش حكم نهائي</span></div><div class="tc-grid" id="tcGrid"></div>';
     $('tcQ').oninput = cards; $('tcT').onchange = cards; $('tcS').onchange = cards;
+    if (r.canExport) techsExport(r, mb);
     cards(); animateCounts($('tcBody'));
   }).catch(function(e){ $('tcBody').innerHTML = emptyHTML('مش قادر أحمّل الفنيين', e.message); });
 };
 
+/** تنزيل ملف التقييمات / المهارات للناس اللي ظاهرين لك بس (المهندس: إدارته — المشرف: فريقه) */
+function techsExport(r, mb){
+  var ppl = r.people.slice().sort(function(a, b){ return a.name.localeCompare(b.name, 'ar'); }), per = ltr(mb.from) + ' ← ' + ltr(mb.to), tag = mb.from.slice(0, 7);
+  var n = function(v){ return v === '' || v == null || isNaN(v) ? '' : Math.round(+v); };
+  $('tcEvCsv').classList.remove('hidden'); $('tcSkCsv').classList.remove('hidden');
+  $('tcEvCsv').onclick = function(){
+    downloadCSV('تقييمات الفنيين — ' + per, ['الكود','الاسم','الدور','الفريق','التقييم المقترح','الحضور %','الالتزام %','الشغل','المهارات','دقائق التأخير','الوقت الإضافي (دقيقة)','المهام اتنفذت','إجمالي المهام'],
+      ppl.map(function(x){ var st = x.stats || {}; return [x.code, x.name, x.title, x.team, n(x.eval.score), n(x.eval.attend), n(x.eval.punct), n(x.eval.work), n(x.eval.skill), st.lateMin || 0, st.otMin || 0, x.tasks.done, x.tasks.total]; }),
+      'NERIC-Evaluations_' + tag, true);
+  };
+  $('tcSkCsv').onclick = function(){
+    downloadCSV('مهارات الفنيين — ' + per, ['الكود','الاسم','الفريق'].concat(r.skills).concat(['المستقل فأعلى']),
+      ppl.map(function(x){ return [x.code, x.name, x.team].concat(r.skills.map(function(_, i){ var l = x.skills[i] || 0; return l ? l + ' - ' + SKILL_LV[l] : '—'; })).concat([x.skills.filter(function(l){ return l >= 3; }).length + '/' + r.skills.length]); }),
+      'NERIC-Skills_' + tag, true);
+  };
+}
 var ATT_TONE = { 'حاضر': 'ok', 'متأخر': 'late', 'غائب': 'abs', 'أجازة': 'lv', 'إذن / مأمورية': 'perm' };
 VIEWS.tech = function(){
   var v = $('view'), p = S.params, email = p.email || B().me.email, mb = monthBounds(p.month || today().slice(0, 7));
@@ -5380,7 +5421,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611130309').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611130338').catch(function(){}); });
 </script>
 </body>
 </html>
