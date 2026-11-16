@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611160916"></script>
+<script src="config.js?v=202611160930"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1279,6 +1279,14 @@ body.ds-C{background:var(--bg)!important}
 /* ---------- طلبات الأجازات ---------- */
 .lri{border-inline-start:4px solid #00d14b;cursor:default}
 .lrold{margin-top:10px}
+/* الحضور: كل فريق لوحده */
+.att-team{margin:0 0 18px;padding:12px 12px 4px;border-radius:16px;border:1px solid var(--line);background:color-mix(in srgb,var(--blue) 3%,var(--card));border-inline-start:5px solid var(--blue)}
+.att-th{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;margin-bottom:8px}
+.att-th h3{margin:0;font-size:18px;font-weight:900;margin-inline-end:auto}
+.att-miss{margin:0 0 8px;font-size:13px}
+.att-teams{margin-top:12px}
+.att-tc{cursor:pointer;border-inline-start:5px solid var(--blue)}
+.att-tc:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
 .lr-ph{border-style:dashed}
 .lr-ph.has{border-style:solid;border-color:color-mix(in srgb,#00d14b 45%,var(--line));background:color-mix(in srgb,#00d14b 9%,var(--card))}
 .lrold summary{cursor:pointer;font-weight:800;color:var(--muted);margin-bottom:8px}
@@ -2675,6 +2683,14 @@ function renderDash(d){
     ((isOwner() || isQM()) && d.att.pending ? ' — <b style="color:var(--amber)">بانتظار الاعتماد: ' + d.att.pending + '</b>' : '') + '</div>' +
     ((isOwner() || isQM()) && d.att.notRegistered.length ? '<div class="sub" style="margin:6px 0 0">لم يسجل لسه: ' + d.att.notRegistered.map(esc).join('، ') + '</div>' : '') +
     '<div class="sub" style="margin:4px 0 0">«لم يسجل» معناها مفيش سجل لسه — مش معناها غياب.</div></div>';
+  if (d.att.teams && d.att.teams.length > 1){
+    var tm = {}; d.att.teams.forEach(function(t){ tm[t.team] = t; });
+    h += '<div class="grid g2 att-teams">' + teamOrder(Object.keys(tm)).map(function(k){ var t = tm[k];
+      return '<div class="card att-tc" data-go="att"><div class="att-th"><h3>👥 حضور ' + esc(teamShort(t.team)) + '</h3><span class="chip">' + t.present + '/' + t.total + ' موجود</span></div>' +
+        '<div class="row">' + ['حاضر','متأخر','غائب','أجازة','إذن / مأمورية','لم يسجل'].filter(function(s){ return t.counts[s]; }).map(function(s){ return statusChip(s).replace('</span>', '<span class="cnt">&nbsp;:&nbsp;' + t.counts[s] + '</span></span>'); }).join(' ') + '</div>' +
+        (t.notReg.length ? '<div class="sub att-miss">لسه ماسجلش: ' + t.notReg.map(esc).join('، ') + '</div>' : '') + '</div>';
+    }).join('') + '</div>';
+  }
 
   h += boardHTML(d.board, true, '', '<div class="sec-title lines-title"><h2>لوحة الخطوط — مكان العربات الآن</h2></div>');
 
@@ -2689,6 +2705,16 @@ function renderDash(d){
   if ($('myleave') && !$('myleave').dataset.done){ $('myleave').dataset.done = '1'; loadMyLeave($('myleave')); }
   wireMyAtt(); wireItems(); wireBoard(d.board); fixHwGap();
   if ($('recentRefresh')) $('recentRefresh').onclick = function(){ this.disabled = true; call('dashboard', {}).then(function(x){ S.lastDash = x; renderDash(x); toast('تم التحديث'); }).catch(function(e){ toast(e.message, 'err'); }); };
+}
+/** الفرق: اسم قصير («فريق التوزيع») — وترتيبها: فريقك الأول وبعدين زي ورقة «القوائم» */
+function teamShort(t){ t = String(t || '').trim(); return t ? t.split(' - ')[0].trim() : 'من غير فريق'; }
+function personTeam(email, fallback){ var p = (B().people || []).filter(function(x){ return x.email === email; })[0]; return (p && p.team) || fallback || ''; }
+function teamOrder(names){
+  var mine = String((B().me || {}).team || '').trim(), lst = ((B().lists || {}).teams || []).map(function(t){ return String(t).trim(); });
+  return names.slice().sort(function(a, b){
+    var ka = a === mine ? -1 : !a ? 999 : (lst.indexOf(a) < 0 ? 500 : lst.indexOf(a)), kb = b === mine ? -1 : !b ? 999 : (lst.indexOf(b) < 0 ? 500 : lst.indexOf(b));
+    return ka - kb || a.localeCompare(b, 'ar');
+  });
 }
 function attChips(c){
   return ['حاضر','متأخر','غائب','أجازة','إذن / مأمورية','لم يسجل'].map(function(k){
@@ -2931,7 +2957,22 @@ VIEWS.att = function(){
       (otMin ? '<div class="ot-sum"><span class="chip c-ot">⏱ وقت إضافي</span> <b>' + fmtOt(otMin) + '</b> في ' + otDays + (otDays === 1 ? ' يوم' : ' أيام') + '</div>' : '') + '</div>';
     var pend = rows.filter(function(r){ return r.approval === 'بانتظار الاعتماد' && canApprove(r); });
     if ((own || qm) && pend.length) h += '<div class="row" style="margin-bottom:10px"><span class="chip c-amber">بانتظار الاعتماد : ' + pend.length + '</span><button class="btn sm green" id="apprAll">اعتماد الكل</button></div>';
-    h += rows.length ? '<div class="list">' + rows.map(attItem).join('') + '</div>' : emptyHTML('مفيش تسجيلات حضور', 'في ' + label + (own && who ? ' للفني ده' : '') + '.');
+    // كل فريق لوحده (حضور فريق التوزيع — حضور فريق تركيب الأجهزة …) علشان الفرق ماتتلخبطش
+    var grp = {}; rows.forEach(function(r){ var t = personTeam(r.email, r.team); (grp[t] = grp[t] || []).push(r); });
+    var seeP = (own ? (B().people || []).filter(function(x){ return x.role !== 'مشاهد' && !x.owner; }) : techs).filter(function(x){ return x.email !== B().me.email || !own; });
+    if (!who && mode === 'day') seeP.forEach(function(x){ var t = x.team || ''; if (!grp[t]) grp[t] = []; });
+    var tNames = teamOrder(Object.keys(grp));
+    if (!who && tNames.length > 1){
+      h += tNames.map(function(t){
+        var rr = grp[t], cs = {}; rr.forEach(function(r){ cs[r.status] = (cs[r.status] || 0) + 1; });
+        var miss = mode === 'day' ? seeP.filter(function(x){ return (x.team || '') === t && !rr.some(function(r){ return r.email === x.email; }); }) : [];
+        return '<section class="att-team"><div class="att-th"><h3>👥 حضور ' + esc(teamShort(t)) + '</h3><span class="chip">' + rr.length + ' تسجيل</span>' +
+          ['حاضر','متأخر','غائب','أجازة','إذن / مأمورية'].filter(function(k){ return cs[k]; }).map(function(k){ return statusChip(k).replace('</span>', '<span class="cnt">&nbsp;:&nbsp;' + cs[k] + '</span></span>'); }).join(' ') +
+          (miss.length ? '<span class="chip c-gray">لم يسجل : ' + miss.length + '</span>' : '') + '</div>' +
+          (miss.length ? '<div class="sub att-miss">لسه ماسجلش: ' + miss.map(function(x){ return esc(x.name); }).join('، ') + '</div>' : '') +
+          (rr.length ? '<div class="list">' + rr.map(attItem).join('') + '</div>' : '') + '</section>';
+      }).join('');
+    } else h += rows.length ? '<div class="list">' + rows.map(attItem).join('') + '</div>' : emptyHTML('مفيش تسجيلات حضور', 'في ' + label + (own && who ? ' للفني ده' : '') + '.');
     $('attBody').innerHTML = h;
     wireItems();
     if ($('apprAll')) $('apprAll').onclick = function(){
@@ -5453,7 +5494,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611160916').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611160930').catch(function(){}); });
 </script>
 </body>
 </html>
