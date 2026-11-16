@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611160816"></script>
+<script src="config.js?v=202611160834"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1279,6 +1279,8 @@ body.ds-C{background:var(--bg)!important}
 /* ---------- طلبات الأجازات ---------- */
 .lri{border-inline-start:4px solid #00d14b;cursor:default}
 .lrold{margin-top:10px}
+.lr-ph{border-style:dashed}
+.lr-ph.has{border-style:solid;border-color:color-mix(in srgb,#00d14b 45%,var(--line));background:color-mix(in srgb,#00d14b 9%,var(--card))}
 .lrold summary{cursor:pointer;font-weight:800;color:var(--muted);margin-bottom:8px}
 
 /* ---------- تسليم الوردية ---------- */
@@ -2172,7 +2174,9 @@ function techPickOptions(){
     return p.role === 'فني' || p.role === 'مشرف';
   });
 }
-function peopleOptions(filter){ return (B().people || []).filter(filter || function(){ return true; }).map(function(p){ return { v: p.name, t: p.name + (p.code ? ' (' + p.code + ')' : '') }; }); }
+/** مشرف الجودة: الناس بتوعه بس (فنيين الجودة) في كل القوايم */
+function myPeopleOnly(p){ return !(isQM() && !isOwner()) || p.side === 'quality' || p.email === B().me.email; }
+function peopleOptions(filter){ return (B().people || []).filter(myPeopleOnly).filter(filter || function(){ return true; }).map(function(p){ return { v: p.name, t: p.name + (p.code ? ' (' + p.code + ')' : '') }; }); }
 function techOptionsByEmail(){ var qm = !isOwner() && isQM(); if (isEng() && !qm) return [{ v: B().me.email, t: B().me.name + (B().me.code ? ' (' + B().me.code + ')' : '') }]; return (B().people || []).filter(function(p){ return qm ? (p.isQ || p.email === B().me.email) : (p.role === 'فني' || p.role === 'مشرف'); }).map(function(p){ return { v: p.email, t: p.name + (p.code ? ' (' + p.code + ')' : '') + (p.team ? ' — ' + p.team : '') }; }); }
 /* ---------- اسم العربة: C16 - MCI - U4 (رقم العربة شمال، النوع في النص، الوحدة يمين) ---------- */
 function normCarNo(v){ v = String(v == null ? '' : v).replace(/\s+/g, '').toUpperCase().replace(/[٠-٩]/g, function(d){ return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); }); return /^\d+$/.test(v) ? 'C' + v : v; }
@@ -4710,7 +4714,8 @@ function XFORMS(){
       { k:'type', t:'نوع الأجازة', type:'select', req:1, options: opts(B().status.leaveTypes), full:1 },
       { k:'from', t:'من تاريخ', type:'date', req:1, def: function(){ return addDays(today(), 1); } },
       { k:'to', t:'إلى تاريخ', type:'date', req:1, def: function(){ return addDays(today(), 1); } },
-      { k:'reason', t:'السبب (اختياري)', type:'textarea', full:1 }
+      { k:'reason', t:'السبب (اختياري)', type:'textarea', full:1 },
+      { k:'photos', t:'صورة ورقة الأجازة (اختياري — وممكن تضيفها بعدين)', type:'photos', kind:'leaveReq', full:1 }
     ]}
   };
 }
@@ -4831,6 +4836,7 @@ VIEWS.safety = function(){
 function leaveReqItem(r, canDecide){
   return '<div class="item lri" data-lr="' + esc(r.id) + '"><div class="t">🏖️ ' + esc(r.name) + (r.empCode ? ' <span class="chip c-blue"><bdi>' + esc(r.empCode) + '</bdi></span>' : '') + ' <span class="chip ' + (r.type === 'اعتيادية' ? 'c-green' : r.type === 'عارضة' ? 'c-amber' : 'c-blue') + '">' + esc(r.type) + '</span> ' + xChip(r.status) + '</div>' +
     '<div class="m"><span>📅 ' + ltr(r.from) + (r.to !== r.from ? ' ← ' + ltr(r.to) : '') + '</span><span><b>' + esc(r.days) + '</b> يوم شغل</span>' + (r.reason ? '<span>💬 ' + esc(r.reason) + '</span>' : '') + '</div>' +
+    (r.status !== 'اتلغى' && (photoIdsOf(r.photos).length || r.email === B().me.email || isMgr()) ? '<div class="m"><button class="btn sm lr-ph' + (photoIdsOf(r.photos).length ? ' has' : '') + '" data-lrph="' + esc(r.id) + '">📄 ' + (photoIdsOf(r.photos).length ? 'ورقة الأجازة (' + photoIdsOf(r.photos).length + ' صورة)' : 'أضف صورة ورقة الأجازة') + '</button></div>' : '') +
     (r.decidedBy && r.status !== 'بانتظار الاعتماد' ? '<div class="m"><span>' + (r.status === 'اتلغى' ? 'اتلغى' : 'القرار') + ': ' + esc(r.decidedBy) + ' — ' + ltr(r.decidedAt || '') + '</span>' + (r.decisionNote ? '<span>📝 ' + esc(r.decisionNote) + '</span>' : '') + '</div>' : '') +
     (r.status === 'بانتظار الاعتماد' ? '<div class="acts">' + (canDecide ? '<button class="btn sm primary" data-lrok="' + esc(r.id) + '">✅ اعتماد</button><button class="btn sm danger" data-lrno="' + esc(r.id) + '">رفض</button>' : '') +
       (r.email === B().me.email ? '<button class="btn sm" data-lrcancel="' + esc(r.id) + '">إلغاء الطلب</button>' : '') + '</div>' : '') + '</div>';
@@ -4850,11 +4856,28 @@ function leaveReqsHTML(target){
     var byId = {}; rows.forEach(function(r){ byId[r.id] = r; });
     Array.prototype.forEach.call(target.querySelectorAll('[data-lrok]'), function(b){ b.onclick = function(){ leaveDecideUI(byId[b.dataset.lrok], 'معتمد'); }; });
     Array.prototype.forEach.call(target.querySelectorAll('[data-lrno]'), function(b){ b.onclick = function(){ leaveDecideUI(byId[b.dataset.lrno], 'مرفوض'); }; });
+    Array.prototype.forEach.call(target.querySelectorAll('[data-lrph]'), function(b){ b.onclick = function(){ leavePaperUI(byId[b.dataset.lrph]); }; });
     Array.prototype.forEach.call(target.querySelectorAll('[data-lrcancel]'), function(b){ b.onclick = function(){
       if (!confirm('تلغي طلب الأجازة ده؟')) return; b.disabled = true;
       call('xSave', { entity: 'leaveReq', record: { id: b.dataset.lrcancel, status: 'اتلغى' } }).then(function(){ toast('الطلب اتلغى', 'ok'); go('leave', S.params, true); }).catch(function(e){ b.disabled = false; toast(e.message, 'err'); });
     }; });
   }).catch(function(e){ target.innerHTML = '<div class="sub">' + esc(e.message) + '</div>'; });
+}
+/** صورة ورقة الأجازة: تتشاف — وتتضاف أو تتغير بعدين (صاحب الطلب / المسؤول / اللي بيعتمد أجازته) */
+function leavePaperUI(r){
+  var f = { k: 'photos', t: 'صورة ورقة الأجازة', type: 'photos', kind: 'leaveReq', full: 1 };
+  var can = r.email === B().me.email || isOwner() || isMgr();
+  openModal('📄 ورقة الأجازة — ' + esc(r.name), '<div id="fmsg"></div><div class="note">' + esc(r.type) + ' — ' + esc(r.days) + ' يوم: ' + ltr(r.from) + (r.to !== r.from ? ' ← ' + ltr(r.to) : '') + ' — ' + esc(r.status) + '</div><div class="form" style="margin-top:10px">' + fieldHTML(f, r.photos || '', !can) + '</div>',
+    (can ? '<button class="btn primary" id="lpSave">حفظ الصورة</button>' : '') + '<button class="btn" id="fcancel">' + (can ? 'إلغاء' : 'إغلاق') + '</button>');
+  $('fcancel').onclick = closeModal;
+  wirePhotos('f_photos', f, !can);
+  if (!can) return;
+  $('lpSave').onclick = function(){
+    if (PHOTO_BUSY > 0){ formMsg('استنى لحظة — الصورة لسه بترفع.', 'warn'); return; }
+    var b = $('lpSave'); b.disabled = true; b.textContent = 'جاري الحفظ...';
+    call('xSave', { entity: 'leaveReq', record: { id: r.id, photos: readField(f) } }).then(function(){ closeModal(); toast('صورة ورقة الأجازة اتحفظت 📄', 'ok'); go('leave', S.params, true); })
+      .catch(function(e){ b.disabled = false; b.textContent = 'حفظ الصورة'; formMsg(e.message); });
+  };
 }
 function leaveDecideUI(r, dec){
   var ok = dec === 'معتمد';
@@ -5461,7 +5484,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611160816').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611160834').catch(function(){}); });
 </script>
 </body>
 </html>
