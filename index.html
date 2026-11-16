@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611130338"></script>
+<script src="config.js?v=202611160816"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1636,6 +1636,46 @@ table.sk tbody th{text-align:start;position:sticky;inset-inline-start:0;backgrou
 }
 @media (prefers-reduced-motion:reduce){ .rg-fg,.tc-k,.tc,.tc-bt i,.ebar-t i,.skc-mini i,.rd-shape,.tp-days i,.tp-hero{animation:none} }
 </style>
+<script>
+/* ---------- الموبايل لما يكون شغال «نسخة سطح المكتب» ----------
+   لو المتصفح على الموبايل متفعّل فيه «Desktop site» بيتجاهل عرض الشاشة الحقيقي ويرسم الصفحة بعرض 980 —
+   فالهيدر والصفحة بيتلخبطوا. هنا بنكتشف ده ونرجّع شكل الموبايل لوحده:
+   1) شروط @media بتاعة العرض بتتحسب على عرض الموبايل الحقيقي  2) الصفحة بتتكبّر علشان المقاسات ترجع طبيعية */
+(function(){
+  var orig = [], on = false;
+  function realW(){ var w = screen.width || 0, h = screen.height || 0; return (window.orientation === 90 || window.orientation === -90 || (screen.orientation && /landscape/.test(screen.orientation.type))) ? Math.max(w, h) : Math.min(w, h) || w; }
+  function forced(){
+    var coarse = window.matchMedia && matchMedia('(pointer:coarse)').matches, rw = realW();
+    return coarse && rw > 0 && rw <= 860 && innerWidth > rw * 1.25;
+  }
+  function eachMedia(list, fn){
+    for (var i = 0; i < list.length; i++){ var r = list[i];
+      if (r.media && r.cssRules && r.type === 4) fn(r);
+      if (r.cssRules) eachMedia(r.cssRules, fn);
+    }
+  }
+  function apply(){
+    var want = forced(), rw = realW(), root = document.documentElement;
+    if (!want && !on) return;
+    for (var k = 0; k < document.styleSheets.length; k++){
+      var sh = document.styleSheets[k], rules; try { rules = sh.cssRules; } catch(e){ continue; }
+      if (!rules) continue;
+      eachMedia(rules, function(r){
+        if (r.__o === undefined){ if (!/(min|max)-width/.test(r.media.mediaText)) return; r.__o = r.media.mediaText; orig.push(r); }
+        r.media.mediaText = want ? r.__o.replace(/\((min|max)-width\s*:\s*(\d+(?:\.\d+)?)px\)/g, function(_, mm, n){ n = +n; var ok = mm === 'max' ? rw <= n : rw >= n; return ok ? '(min-width:0px)' : '(max-width:0px)'; }) : r.__o;
+      });
+    }
+    root.style.zoom = want ? String(+(innerWidth / rw).toFixed(3)) : '';
+    root.classList.toggle('force-phone', want);
+    on = want;
+  }
+  window.nericPhoneFix = apply;
+  apply();
+  document.addEventListener('DOMContentLoaded', apply);
+  window.addEventListener('orientationchange', function(){ setTimeout(apply, 300); });
+  var t; window.addEventListener('resize', function(){ clearTimeout(t); t = setTimeout(apply, 250); });
+})();
+</script>
 </head>
 <body>
 
@@ -5421,7 +5461,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611130338').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611160816').catch(function(){}); });
 </script>
 </body>
 </html>
