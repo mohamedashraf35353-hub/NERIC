@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611160937"></script>
+<script src="config.js?v=202611160942"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -5090,7 +5090,7 @@ VIEWS.mailrep = function(){
       '<button class="btn primary" data-mrq="d">📅 تقرير النهارده</button><button class="btn primary" data-mrq="w">🗓️ الأسبوع اللي فات</button><button class="btn primary" data-mrq="m">📆 الشهر اللي فات</button></div></div>' +
     '<div class="filters"><div class="f">من<input type="date" id="mrF" value="' + from + '"></div><div class="f">إلى<input type="date" id="mrT" value="' + to + '"></div>' +
     '<button class="btn" id="mrD">النهارده</button><button class="btn" id="mrW">الأسبوع اللي فات</button><button class="btn" id="mrM">الشهر اللي فات</button><button class="btn" id="mrGo">معاينة</button></div>' +
-    '<div class="note" style="margin-bottom:12px">⏰ <b>بيتبعت لوحده:</b> اليومي كل يوم شغل الساعة 7 بالليل — الأسبوعي كل أحد 8 الصبح — الشهري أول كل شهر (بعد ما تشغّل <bdi dir="ltr">setupTriggers</bdi> مرة واحدة من محرر Apps Script). بيوصل ليك ولكل المهندسين لوحده، ولو عايزه يوصل لحد تاني اكتب إيميله في الإعدادات (REPORT_EMAILS).</div>' +
+    '<div class="note" style="margin-bottom:12px">⏰ <b>بيتبعت لوحده:</b> اليومي كل يوم شغل الساعة 6 مساءً — الأسبوعي كل أحد 8 الصبح — الشهري أول كل شهر (بعد ما تشغّل <bdi dir="ltr">setupTriggers</bdi> مرة واحدة من محرر Apps Script). بيوصل ليك ولكل المهندسين لوحده، ولو عايزه يوصل لحد تاني اكتب إيميله في الإعدادات (REPORT_EMAILS).</div>' +
     '<div id="mrBody">' + loadingHTML() + '</div>';
   var again = function(f, t){ go('mailrep', { from: f, to: t }, true); };
   $('mrGo').onclick = function(){ again($('mrF').value, $('mrT').value); };
@@ -5507,7 +5507,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611160937').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611160942').catch(function(){}); });
 </script>
 </body>
 </html>
