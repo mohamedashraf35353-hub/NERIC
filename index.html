@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="NERIC">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<script src="config.js?v=202611160930"></script>
+<script src="config.js?v=202611160937"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>NERIC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1279,6 +1279,8 @@ body.ds-C{background:var(--bg)!important}
 /* ---------- طلبات الأجازات ---------- */
 .lri{border-inline-start:4px solid #00d14b;cursor:default}
 .lrold{margin-top:10px}
+.mr-quick{margin-bottom:12px;border-inline-start:5px solid var(--blue)}
+.mr-prev table{max-width:100%}.mr-prev{overflow-x:auto}
 /* الحضور: كل فريق لوحده */
 .att-team{margin:0 0 18px;padding:12px 12px 4px;border-radius:16px;border:1px solid var(--line);background:color-mix(in srgb,var(--blue) 3%,var(--card));border-inline-start:5px solid var(--blue)}
 .att-th{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;margin-bottom:8px}
@@ -5082,20 +5084,31 @@ VIEWS.mailrep = function(){
   if (!isOwner()){ $('view').innerHTML = emptyHTML('الصفحة دي للمسؤول بس', ''); return; }
   var p = S.params, to = p.to || addDays(today(), -1), from = p.from || addDays(to, -6);
   var lastMonthEnd = addDays(today().slice(0, 8) + '01', -1), lastMonthStart = lastMonthEnd.slice(0, 8) + '01';
-  $('view').innerHTML = '<div class="row"><div><h1 class="page">📨 التقرير بالبريد</h1><p class="sub">ملخص الإنتاج والجودة والتوقفات والحضور والخامات والسلامة — بيوصل PDF على الإيميل</p></div></div>' +
+  var lastW = addDays(today(), -1);
+  $('view').innerHTML = '<div class="row"><div><h1 class="page">📨 التقرير بالبريد</h1><p class="sub">الإنتاج والجودة والتوقفات والحضور + المهام اليومية للناس + التقييم المقترح + الخامات والسلامة — بيوصل PDF على الإيميل ليك وللمهندسين</p></div></div>' +
+    '<div class="card mr-quick"><b>📨 ابعت دلوقتي بضغطة زرار</b><div class="row" style="margin-top:10px">' +
+      '<button class="btn primary" data-mrq="d">📅 تقرير النهارده</button><button class="btn primary" data-mrq="w">🗓️ الأسبوع اللي فات</button><button class="btn primary" data-mrq="m">📆 الشهر اللي فات</button></div></div>' +
     '<div class="filters"><div class="f">من<input type="date" id="mrF" value="' + from + '"></div><div class="f">إلى<input type="date" id="mrT" value="' + to + '"></div>' +
-    '<button class="btn" id="mrW">الأسبوع اللي فات</button><button class="btn" id="mrM">الشهر اللي فات</button><button class="btn" id="mrGo">معاينة</button></div>' +
-    '<div class="note" style="margin-bottom:12px">⏰ <b>الإرسال التلقائي:</b> شغّل الدالة <bdi dir="ltr">setupReportTriggers</bdi> مرة واحدة من محرر Apps Script — التقرير الأسبوعي هيوصل كل أحد 8 الصبح، والشهري أول كل شهر. ولو عايزه يوصل لحد تاني اكتب إيميله في الإعدادات (REPORT_EMAILS).</div>' +
+    '<button class="btn" id="mrD">النهارده</button><button class="btn" id="mrW">الأسبوع اللي فات</button><button class="btn" id="mrM">الشهر اللي فات</button><button class="btn" id="mrGo">معاينة</button></div>' +
+    '<div class="note" style="margin-bottom:12px">⏰ <b>بيتبعت لوحده:</b> اليومي كل يوم شغل الساعة 7 بالليل — الأسبوعي كل أحد 8 الصبح — الشهري أول كل شهر (بعد ما تشغّل <bdi dir="ltr">setupTriggers</bdi> مرة واحدة من محرر Apps Script). بيوصل ليك ولكل المهندسين لوحده، ولو عايزه يوصل لحد تاني اكتب إيميله في الإعدادات (REPORT_EMAILS).</div>' +
     '<div id="mrBody">' + loadingHTML() + '</div>';
   var again = function(f, t){ go('mailrep', { from: f, to: t }, true); };
   $('mrGo').onclick = function(){ again($('mrF').value, $('mrT').value); };
+  $('mrD').onclick = function(){ again(today(), today()); };
   $('mrW').onclick = function(){ var t = addDays(today(), -1); again(addDays(t, -6), t); };
+  var Q = { d: [today(), today(), 'التقرير اليومي'], w: [addDays(lastW, -6), lastW, 'التقرير الأسبوعي'], m: [lastMonthStart, lastMonthEnd, 'التقرير الشهري'] };
+  Array.prototype.forEach.call(document.querySelectorAll('[data-mrq]'), function(b){ b.onclick = function(){
+    var q = Q[b.dataset.mrq], old = b.textContent; if (!confirm('أبعت ' + q[2] + ' (' + q[0] + (q[1] !== q[0] ? ' ← ' + q[1] : '') + ') دلوقتي على الإيميل؟')) return;
+    b.disabled = true; b.textContent = 'جاري الإرسال...';
+    call('reportMail', { from: q[0], to: q[1], title: q[2], send: true }).then(function(x){ b.textContent = '✅ اتبعت'; toast(q[2] + ' اتبعت على ' + x.sent.length + ' إيميل', 'ok'); setTimeout(function(){ b.disabled = false; b.textContent = old; }, 4000); })
+      .catch(function(e){ b.disabled = false; b.textContent = old; toast(e.message, 'err'); });
+  }; });
   $('mrM').onclick = function(){ again(lastMonthStart, lastMonthEnd); };
-  call('reportMail', { from: from, to: to }).then(function(r){
+  call('reportMail', { from: from, to: to, title: from === to ? 'التقرير اليومي' : undefined }).then(function(r){
     $('mrBody').innerHTML = '<div class="card mr-prev">' + r.html + '</div><div class="row" style="margin-top:12px"><button class="btn primary" id="mrSend">📨 ابعته دلوقتي PDF</button><span class="sub" style="margin:0">هيروح على: ' + r.to.map(function(e){ return ltr(e); }).join('، ') + '</span></div>';
     $('mrSend').onclick = function(){
       var b = this; b.disabled = true; b.textContent = 'جاري الإرسال...';
-      call('reportMail', { from: from, to: to, send: true }).then(function(x){ b.textContent = '✅ اتبعت'; toast('التقرير اتبعت على ' + x.sent.length + ' إيميل', 'ok'); }).catch(function(e){ b.disabled = false; b.textContent = '📨 ابعته دلوقتي PDF'; toast(e.message, 'err'); });
+      call('reportMail', { from: from, to: to, title: from === to ? 'التقرير اليومي' : undefined, send: true }).then(function(x){ b.textContent = '✅ اتبعت'; toast('التقرير اتبعت على ' + x.sent.length + ' إيميل', 'ok'); }).catch(function(e){ b.disabled = false; b.textContent = '📨 ابعته دلوقتي PDF'; toast(e.message, 'err'); });
     };
   }).catch(function(e){ $('mrBody').innerHTML = emptyHTML('مش قادر أعمل التقرير', e.message); });
 };
@@ -5494,7 +5507,7 @@ if (!window.NERIC_API || /PASTE/.test(window.NERIC_API)) {
   if (window.matchMedia) try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync); } catch(e){}
 })();
 /* التثبيت والعمل من غير نت: الـ Service Worker بيحفظ شكل التطبيق، والبيانات دايمًا من السيرفر */
-if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611160930').catch(function(){}); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js?v=202611160937').catch(function(){}); });
 </script>
 </body>
 </html>
